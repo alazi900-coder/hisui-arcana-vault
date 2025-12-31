@@ -3,7 +3,7 @@ import hisuiPokemon from '@/data/hisui-pokemon';
 import { hisuiMoves } from '@/data/hisui-moves';
 import { hisuiItems } from '@/data/hisui-items';
 import { hisuiLearnsets, defaultLearnset } from '@/data/hisui-learnsets';
-
+import { hisuiSpawns } from '@/data/hisui-spawns';
 // Apply learnsets to Pokemon
 const pokemonWithLearnsets = hisuiPokemon.map(pokemon => ({
   ...pokemon,
