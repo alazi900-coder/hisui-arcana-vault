@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { clearAllData } from '@/lib/db';
-import { loadSeedData } from '@/lib/seed-data';
+import { loadSeedData, reloadAllData } from '@/lib/seed-data';
 import { cn } from '@/lib/utils';
 
 export default function SettingsPage() {
@@ -21,9 +21,13 @@ export default function SettingsPage() {
   };
 
   const handleReloadSeed = async () => {
-    await clearAllData();
-    await loadSeedData();
-    toast.success(t('تم إعادة تحميل البيانات', 'Seed data reloaded'));
+    try {
+      await reloadAllData();
+      toast.success(t('تم تحميل 242 بوكيمون!', '242 Pokémon loaded!'));
+    } catch (error) {
+      console.error('Reload error:', error);
+      toast.error(t('حدث خطأ', 'Error occurred'));
+    }
   };
 
   const handleClearData = async () => {
