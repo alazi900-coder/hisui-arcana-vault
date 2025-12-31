@@ -7,7 +7,8 @@ import { PokemonCard } from '@/components/PokemonCard';
 import { Link } from 'react-router-dom';
 import { 
   Grid3X3, Swords, Package, MapPin, ClipboardList, GitCompare, 
-  Upload, Sparkles, Crown, Zap, FlaskConical, Clock, Search, Map
+  Upload, Sparkles, Crown, Zap, FlaskConical, Clock, Search, Map,
+  Users, Calculator, Heart, Target
 } from 'lucide-react';
 
 const quickLinks = [
@@ -20,6 +21,14 @@ const quickLinks = [
   { path: '/requests', icon: ClipboardList, labelAr: 'المهام', labelEn: 'Requests', color: 'bg-type-psychic/20 text-type-psychic' },
   { path: '/compare', icon: GitCompare, labelAr: 'المقارنة', labelEn: 'Compare', color: 'bg-gold/20 text-gold' },
   { path: '/search', icon: Search, labelAr: 'البحث', labelEn: 'Search', color: 'bg-type-electric/20 text-type-electric' },
+];
+
+const toolsLinks = [
+  { path: '/team-builder', icon: Users, labelAr: 'بناء الفريق', labelEn: 'Team Builder', color: 'bg-primary/20 text-primary' },
+  { path: '/damage-calculator', icon: Calculator, labelAr: 'حاسبة الضرر', labelEn: 'Damage Calc', color: 'bg-destructive/20 text-destructive' },
+  { path: '/type-chart', icon: Grid3X3, labelAr: 'مخطط الأنواع', labelEn: 'Type Chart', color: 'bg-accent/20 text-accent' },
+  { path: '/favorites', icon: Heart, labelAr: 'المفضلة', labelEn: 'Favorites', color: 'bg-type-fire/20 text-type-fire' },
+  { path: '/tracker', icon: Target, labelAr: 'المتتبع', labelEn: 'Tracker', color: 'bg-gold/20 text-gold' },
 ];
 
 const typeIcons: Record<string, React.ElementType> = {
@@ -140,7 +149,32 @@ export default function Index() {
           ))}
         </div>
 
-        {/* Pokemon of the Day */}
+        {/* Tools Section */}
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <Calculator className="w-5 h-5 text-accent" />
+            <h2 className="font-semibold text-foreground">
+              {t('الأدوات', 'Tools')}
+            </h2>
+          </div>
+          <div className="grid grid-cols-5 gap-2">
+            {toolsLinks.map((link, i) => (
+              <Link 
+                key={link.path} 
+                to={link.path}
+                className="animate-fade-in-up"
+                style={{ animationDelay: `${i * 50}ms` }}
+              >
+                <div className={`glass rounded-xl p-3 text-center card-hover ${link.color.split(' ')[0]}`}>
+                  <link.icon className={`w-5 h-5 mx-auto mb-1 ${link.color.split(' ')[1]}`} />
+                  <span className="text-[10px] font-medium text-foreground leading-tight block">
+                    {t(link.labelAr, link.labelEn)}
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
         {pokemonOfDay && (
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-3">
