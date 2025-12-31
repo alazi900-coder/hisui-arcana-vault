@@ -1,96 +1,98 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* PLA Dex X - Cosmic Dark Theme */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
+    /* Cosmic Dark Background */
+    --background: 220 20% 4%;
     --foreground: 210 40% 98%;
 
-    --card: 222.2 84% 4.9%;
+    /* Surface Colors */
+    --card: 220 25% 8%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 222.2 84% 4.9%;
+    --popover: 220 25% 10%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    /* Primary - Electric Cyan */
+    --primary: 185 100% 50%;
+    --primary-foreground: 220 20% 4%;
 
-    --secondary: 217.2 32.6% 17.5%;
+    /* Secondary - Deep Surface */
+    --secondary: 220 30% 12%;
     --secondary-foreground: 210 40% 98%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    /* Muted */
+    --muted: 220 20% 15%;
+    --muted-foreground: 220 15% 55%;
 
-    --accent: 217.2 32.6% 17.5%;
+    /* Accent - Magenta */
+    --accent: 310 100% 60%;
     --accent-foreground: 210 40% 98%;
 
-    --destructive: 0 62.8% 30.6%;
+    /* Destructive */
+    --destructive: 0 72% 51%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Borders */
+    --border: 220 20% 18%;
+    --input: 220 20% 18%;
+    --ring: 185 100% 50%;
+
+    --radius: 0.75rem;
+
+    /* Pokemon Type Colors */
+    --type-normal: 45 10% 50%;
+    --type-fire: 25 100% 55%;
+    --type-water: 210 100% 55%;
+    --type-electric: 50 100% 50%;
+    --type-grass: 120 60% 45%;
+    --type-ice: 185 80% 70%;
+    --type-fighting: 0 70% 45%;
+    --type-poison: 280 60% 50%;
+    --type-ground: 35 50% 45%;
+    --type-flying: 250 80% 70%;
+    --type-psychic: 330 80% 60%;
+    --type-bug: 75 60% 40%;
+    --type-rock: 45 40% 35%;
+    --type-ghost: 265 50% 45%;
+    --type-dragon: 260 90% 55%;
+    --type-dark: 260 20% 25%;
+    --type-steel: 220 20% 60%;
+    --type-fairy: 330 60% 70%;
+
+    /* Badge Colors */
+    --legendary-glow: 45 100% 60%;
+    --alpha-glow: 0 100% 50%;
+    --noble-glow: 280 100% 60%;
+
+    /* Gradients */
+    --gradient-cosmic: linear-gradient(135deg, hsl(220 25% 8%) 0%, hsl(260 30% 10%) 100%);
+    --gradient-glow: linear-gradient(135deg, hsl(185 100% 50% / 0.2) 0%, hsl(310 100% 60% / 0.2) 100%);
+
+    /* Sidebar */
+    --sidebar-background: 220 25% 6%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 185 100% 50%;
+    --sidebar-primary-foreground: 220 20% 4%;
+    --sidebar-accent: 220 30% 15%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 220 20% 15%;
+    --sidebar-ring: 185 100% 50%;
+
+    /* Golden Yellow for special elements */
+    --gold: 45 100% 55%;
+    --gold-foreground: 220 20% 4%;
+  }
+
+  /* Force dark mode always */
+  html {
+    color-scheme: dark;
   }
 }
 
@@ -99,7 +101,249 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  html {
+    font-family: 'Inter', 'IBM Plex Sans Arabic', sans-serif;
+  }
+
+  html[dir="rtl"] {
+    font-family: 'IBM Plex Sans Arabic', 'Inter', sans-serif;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    background-image: 
+      radial-gradient(ellipse at top, hsl(260 30% 12% / 0.5) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom right, hsl(185 100% 50% / 0.05) 0%, transparent 40%),
+      radial-gradient(ellipse at bottom left, hsl(310 100% 60% / 0.05) 0%, transparent 40%);
+    min-height: 100vh;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-background;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/50;
   }
 }
+
+@layer components {
+  /* Glow effects */
+  .glow-cyan {
+    box-shadow: 0 0 20px hsl(185 100% 50% / 0.3),
+                0 0 40px hsl(185 100% 50% / 0.1);
+  }
+
+  .glow-magenta {
+    box-shadow: 0 0 20px hsl(310 100% 60% / 0.3),
+                0 0 40px hsl(310 100% 60% / 0.1);
+  }
+
+  .glow-gold {
+    box-shadow: 0 0 25px hsl(45 100% 55% / 0.4),
+                0 0 50px hsl(45 100% 55% / 0.2);
+  }
+
+  .glow-alpha {
+    box-shadow: 0 0 20px hsl(0 100% 50% / 0.4),
+                0 0 40px hsl(0 100% 50% / 0.2);
+  }
+
+  /* Card hover effects */
+  .card-hover {
+    @apply transition-all duration-300 ease-out;
+  }
+
+  .card-hover:hover {
+    transform: translateY(-4px) scale(1.02);
+  }
+
+  /* Wax seal badge for legendaries */
+  .wax-seal {
+    @apply relative;
+  }
+
+  .wax-seal::before {
+    content: '';
+    @apply absolute inset-0 rounded-full;
+    background: radial-gradient(circle, hsl(45 100% 55% / 0.3) 0%, transparent 70%);
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  /* Bouquet badge for regular pokemon */
+  .bouquet-badge {
+    @apply relative;
+  }
+
+  .bouquet-badge::before {
+    content: '';
+    @apply absolute -inset-2;
+    background: 
+      radial-gradient(circle at 30% 20%, hsl(185 100% 50% / 0.2) 0%, transparent 30%),
+      radial-gradient(circle at 70% 30%, hsl(310 100% 60% / 0.2) 0%, transparent 30%),
+      radial-gradient(circle at 50% 80%, hsl(45 100% 55% / 0.15) 0%, transparent 30%);
+    border-radius: 50%;
+    animation: bouquet-rotate 8s linear infinite;
+  }
+
+  /* Token stack for alpha pokemon */
+  .token-stack {
+    @apply relative;
+  }
+
+  .token-stack::after {
+    content: '';
+    @apply absolute -bottom-1 left-1/2 -translate-x-1/2 w-3/4 h-1;
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      hsl(0 100% 50% / 0.5) 50%, 
+      transparent 100%);
+    border-radius: 50%;
+    filter: blur(2px);
+  }
+
+  /* Sparkle animation */
+  .sparkle {
+    @apply relative overflow-hidden;
+  }
+
+  .sparkle::after {
+    content: '';
+    @apply absolute top-0 left-0 w-full h-full pointer-events-none;
+    background: linear-gradient(
+      45deg,
+      transparent 40%,
+      hsl(0 0% 100% / 0.1) 50%,
+      transparent 60%
+    );
+    transform: translateX(-100%);
+  }
+
+  .sparkle:hover::after {
+    animation: sparkle-sweep 0.6s ease-out;
+  }
+
+  /* Type badge gradients */
+  .type-gradient {
+    @apply relative overflow-hidden;
+  }
+
+  .type-gradient::before {
+    content: '';
+    @apply absolute inset-0 opacity-20;
+    background: linear-gradient(135deg, currentColor 0%, transparent 100%);
+  }
+}
+
+@layer utilities {
+  /* Favorite star animation */
+  .favorite-pulse {
+    animation: favorite-burst 0.4s ease-out;
+  }
+
+  /* Text gradient */
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, hsl(185 100% 50%) 0%, hsl(310 100% 60%) 100%);
+  }
+
+  /* Glass effect */
+  .glass {
+    @apply backdrop-blur-md bg-card/80 border border-border/50;
+  }
+
+  /* Safe area padding for mobile */
+  .safe-area-inset {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* Keyframes */
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes bouquet-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes sparkle-sweep {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes favorite-burst {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animation utilities */
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s ease-out forwards;
+}
+
+.animation-delay-100 { animation-delay: 100ms; }
+.animation-delay-200 { animation-delay: 200ms; }
+.animation-delay-300 { animation-delay: 300ms; }
+.animation-delay-400 { animation-delay: 400ms; }
+.animation-delay-500 { animation-delay: 500ms; }
