@@ -5,9 +5,10 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db, addRecent } from '@/lib/db';
 import { 
   ChevronLeft, ChevronRight, Circle, Heart, Cherry, Sparkles, 
-  Hammer, Key, Package, MapPin, ShoppingBag, Beaker, Info
+  Hammer, Key, Package, MapPin, ShoppingBag, Beaker, Info, ArrowRight, FlaskConical
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import type { Recipe, Item } from '@/types/pokemon';
 
 // PokeAPI item sprites base URL
 const ITEM_SPRITE_BASE = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items';
@@ -129,6 +130,119 @@ const getAcquisitionLocations = (item: { type: string; name_en: string }, t: (ar
   return locations;
 };
 
+// Recipe Card Component
+function RecipeCard({ 
+  recipe, 
+  allItems, 
+  t, 
+  highlightItemId,
+  isOutput 
+}: { 
+  recipe: Recipe; 
+  allItems: Item[]; 
+  t: (ar: string, en: string) => string;
+  highlightItemId?: string;
+  isOutput: boolean;
+}) {
+  const getItem = (itemId: string) => allItems.find(i => i.id === itemId);
+  
+  return (
+    <div className="p-4 rounded-xl bg-background/50 border border-border/30">
+      {/* Recipe name and unlock notes */}
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="font-semibold text-foreground">
+          {t(recipe.name_ar, recipe.name_en)}
+        </h3>
+        <span className="text-xs text-muted-foreground bg-secondary px-2 py-1 rounded-full">
+          {t(recipe.unlock_notes_ar, recipe.unlock_notes_en)}
+        </span>
+      </div>
+      
+      {/* Recipe flow: Ingredients → Output */}
+      <div className="flex items-center gap-3 flex-wrap">
+        {/* Ingredients */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {recipe.ingredients.map((ing, idx) => {
+            const ingItem = getItem(ing.item_id);
+            if (!ingItem) return null;
+            const isHighlighted = ing.item_id === highlightItemId && !isOutput;
+            
+            return (
+              <div key={idx} className="flex items-center gap-1">
+                {idx > 0 && <span className="text-muted-foreground text-xs">+</span>}
+                <Link 
+                  to={`/items/${ingItem.id}`}
+                  className={cn(
+                    "flex items-center gap-1.5 px-2 py-1 rounded-lg transition-all hover:scale-105",
+                    isHighlighted 
+                      ? "bg-primary/20 border border-primary/50 ring-2 ring-primary/30" 
+                      : "bg-secondary/50 hover:bg-secondary"
+                  )}
+                >
+                  <img 
+                    src={getItemSpriteUrl(ingItem.name_en)}
+                    alt={t(ingItem.name_ar, ingItem.name_en)}
+                    className="w-6 h-6 object-contain"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                  <span className={cn(
+                    "text-sm font-medium",
+                    isHighlighted ? "text-primary" : "text-foreground"
+                  )}>
+                    {ing.qty}x
+                  </span>
+                </Link>
+              </div>
+            );
+          })}
+        </div>
+        
+        {/* Arrow */}
+        <ArrowRight className="w-5 h-5 text-muted-foreground shrink-0" />
+        
+        {/* Outputs */}
+        <div className="flex items-center gap-2">
+          {recipe.outputs.map((out, idx) => {
+            const outItem = getItem(out.item_id);
+            if (!outItem) return null;
+            const isHighlighted = out.item_id === highlightItemId && isOutput;
+            
+            return (
+              <Link 
+                key={idx}
+                to={`/items/${outItem.id}`}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all hover:scale-105",
+                  isHighlighted 
+                    ? "bg-accent/20 border border-accent/50 ring-2 ring-accent/30" 
+                    : "bg-type-grass/10 border border-type-grass/30 hover:bg-type-grass/20"
+                )}
+              >
+                <img 
+                  src={getItemSpriteUrl(outItem.name_en)}
+                  alt={t(outItem.name_ar, outItem.name_en)}
+                  className="w-7 h-7 object-contain"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
+                />
+                <span className={cn(
+                  "text-sm font-semibold",
+                  isHighlighted ? "text-accent" : "text-type-grass"
+                )}>
+                  {out.qty}x {t(outItem.name_ar, outItem.name_en)}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ItemDetails() {
   const { id } = useParams<{ id: string }>();
   const { t } = useLanguage();
@@ -136,11 +250,22 @@ export default function ItemDetails() {
 
   const item = useLiveQuery(() => db.items.get(id || ''), [id]);
   const allItems = useLiveQuery(() => db.items.toArray(), []);
+  const allRecipes = useLiveQuery(() => db.recipes.toArray(), []);
   
   // Get previous and next items
   const currentIndex = allItems?.findIndex(i => i.id === id) ?? -1;
   const prevItem = currentIndex > 0 ? allItems?.[currentIndex - 1] : null;
   const nextItem = currentIndex < (allItems?.length ?? 0) - 1 ? allItems?.[currentIndex + 1] : null;
+  
+  // Find recipes that use this item as ingredient
+  const recipesUsingItem = allRecipes?.filter(recipe => 
+    recipe.ingredients.some(ing => ing.item_id === id)
+  ) || [];
+  
+  // Find recipes that produce this item
+  const recipesProducingItem = allRecipes?.filter(recipe => 
+    recipe.outputs.some(out => out.item_id === id)
+  ) || [];
 
   // Track recent view
   useEffect(() => {
@@ -313,6 +438,56 @@ export default function ItemDetails() {
               ))}
             </div>
           </div>
+
+          {/* Recipes that produce this item */}
+          {recipesProducingItem.length > 0 && (
+            <div className="mt-6 bg-secondary/30 rounded-2xl p-5 border border-border/30">
+              <div className="flex items-center gap-2 mb-4">
+                <Beaker className="w-5 h-5 text-primary" />
+                <h2 className="text-lg font-semibold">
+                  {t('كيفية صنعه', 'How to Craft')}
+                </h2>
+              </div>
+              
+              <div className="space-y-4">
+                {recipesProducingItem.map(recipe => (
+                  <RecipeCard 
+                    key={recipe.id} 
+                    recipe={recipe} 
+                    allItems={allItems || []} 
+                    t={t}
+                    highlightItemId={id}
+                    isOutput
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Recipes using this item */}
+          {recipesUsingItem.length > 0 && (
+            <div className="mt-6 bg-secondary/30 rounded-2xl p-5 border border-border/30">
+              <div className="flex items-center gap-2 mb-4">
+                <FlaskConical className="w-5 h-5 text-accent" />
+                <h2 className="text-lg font-semibold">
+                  {t('يُستخدم في صنع', 'Used in Crafting')}
+                </h2>
+              </div>
+              
+              <div className="space-y-4">
+                {recipesUsingItem.map(recipe => (
+                  <RecipeCard 
+                    key={recipe.id} 
+                    recipe={recipe} 
+                    allItems={allItems || []} 
+                    t={t}
+                    highlightItemId={id}
+                    isOutput={false}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Related Items - Same Type */}
           {allItems && (
