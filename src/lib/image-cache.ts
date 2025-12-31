@@ -60,7 +60,6 @@ export async function cacheAllPokemonImages(
   
   for (const p of pokemon) {
     current++;
-    const name = p.name_en.toLowerCase();
     onProgress({ 
       total, 
       current, 
@@ -69,7 +68,7 @@ export async function cacheAllPokemonImages(
     });
     
     // Get reliable image sources for this pokemon
-    const sources = getReliableImageSources(p.id);
+    const sources = getReliableImageSources(p.id, p.dex_no);
     
     // Try to cache at least one image
     for (const src of sources) {

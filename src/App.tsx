@@ -33,6 +33,13 @@ import SettingsPage from "./pages/Settings";
 import DataImportPage from "./pages/DataImport";
 import MapPage from "./pages/Map";
 import NotFound from "./pages/NotFound";
+// New pages
+import TeamBuilderPage from "./pages/TeamBuilder";
+import DamageCalculatorPage from "./pages/DamageCalculator";
+import TypeChartPage from "./pages/TypeChart";
+import FavoritesPage from "./pages/Favorites";
+import TrackerPage from "./pages/Tracker";
+import { OfflineIndicator } from "./components/OfflineIndicator";
 
 const queryClient = new QueryClient();
 
@@ -75,6 +82,7 @@ const App = () => {
           <Sonner />
           <BrowserRouter>
             <div className="min-h-screen flex flex-col">
+              <OfflineIndicator />
               <Header />
               <main className="flex-1">
                 <Routes>
@@ -102,6 +110,12 @@ const App = () => {
                   <Route path="/compare" element={<ComparePage />} />
                   <Route path="/search" element={<SearchPage />} />
                   <Route path="/data-import" element={<DataImportPage />} />
+                  {/* New Features */}
+                  <Route path="/team-builder" element={<TeamBuilderPage />} />
+                  <Route path="/damage-calculator" element={<DamageCalculatorPage />} />
+                  <Route path="/type-chart" element={<TypeChartPage />} />
+                  <Route path="/favorites" element={<FavoritesPage />} />
+                  <Route path="/tracker" element={<TrackerPage />} />
                   {/* Settings */}
                   <Route path="/settings" element={<SettingsPage />} />
                   {/* 404 */}

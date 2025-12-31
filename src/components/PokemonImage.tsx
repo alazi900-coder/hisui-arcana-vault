@@ -89,7 +89,52 @@ export function PokemonImage({
           'w-full h-full object-contain transition-opacity duration-300',
           isLoading ? 'opacity-0' : 'opacity-100'
         )}
-      />
+    />
     </div>
+  );
+}
+
+// Simple fallback component for use in selectors
+interface PokemonImageWithFallbackProps {
+  pokemonId: string;
+  pokemonName: string;
+  className?: string;
+}
+
+export function PokemonImageWithFallback({ 
+  pokemonId, 
+  pokemonName, 
+  className 
+}: PokemonImageWithFallbackProps) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [hasError, setHasError] = useState(false);
+  
+  // Extract dex number from ID if possible
+  const dexNo = parseInt(pokemonId.replace(/\D/g, '')) || 1;
+  const imageSources = getReliableImageSources(pokemonId, dexNo);
+  
+  const handleError = () => {
+    if (currentIndex < imageSources.length - 1) {
+      setCurrentIndex(prev => prev + 1);
+    } else {
+      setHasError(true);
+    }
+  };
+  
+  if (hasError) {
+    return (
+      <div className={cn('flex items-center justify-center bg-secondary/50 rounded-full', className)}>
+        <span className="text-2xl">❓</span>
+      </div>
+    );
+  }
+  
+  return (
+    <img
+      src={imageSources[currentIndex]}
+      alt={pokemonName}
+      onError={handleError}
+      className={cn('object-contain', className)}
+    />
   );
 }
