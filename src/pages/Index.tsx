@@ -7,13 +7,14 @@ import { PokemonCard } from '@/components/PokemonCard';
 import { Link } from 'react-router-dom';
 import { 
   Grid3X3, Swords, Package, MapPin, ClipboardList, GitCompare, 
-  Upload, Sparkles, Crown, Zap 
+  Upload, Sparkles, Crown, Zap, FlaskConical 
 } from 'lucide-react';
 
 const quickLinks = [
   { path: '/pokemon', icon: Grid3X3, labelAr: 'بوكيدكس', labelEn: 'Pokédex', color: 'bg-primary/20 text-primary' },
   { path: '/moves', icon: Swords, labelAr: 'الحركات', labelEn: 'Moves', color: 'bg-destructive/20 text-destructive' },
   { path: '/items', icon: Package, labelAr: 'العناصر', labelEn: 'Items', color: 'bg-accent/20 text-accent' },
+  { path: '/recipes', icon: FlaskConical, labelAr: 'الوصفات', labelEn: 'Recipes', color: 'bg-type-poison/20 text-type-poison' },
   { path: '/locations', icon: MapPin, labelAr: 'المواقع', labelEn: 'Locations', color: 'bg-type-grass/20 text-type-grass' },
   { path: '/requests', icon: ClipboardList, labelAr: 'المهام', labelEn: 'Requests', color: 'bg-type-psychic/20 text-type-psychic' },
   { path: '/compare', icon: GitCompare, labelAr: 'المقارنة', labelEn: 'Compare', color: 'bg-gold/20 text-gold' },

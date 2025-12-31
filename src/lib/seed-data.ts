@@ -1,4 +1,4 @@
-import type { Pokemon, Move, Location, Spawn, Item, Request } from '@/types/pokemon';
+import type { Pokemon, Move, Location, Spawn, Item, Request, Recipe } from '@/types/pokemon';
 
 // Seed data with 20 Pokémon from Legends: Arceus
 export const seedPokemon: Pokemon[] = [
@@ -461,6 +461,56 @@ export const seedRequests: Request[] = [
   },
 ];
 
+export const seedRecipes: Recipe[] = [
+  {
+    id: 'recipe-pokeball',
+    name_ar: 'صنع كرة بوكي',
+    name_en: 'Craft Poké Ball',
+    outputs: [{ item_id: 'poke-ball', qty: 1 }],
+    ingredients: [
+      { item_id: 'black-tumblestone', qty: 1 },
+      { item_id: 'oran-berry', qty: 1 },
+    ],
+    unlock_notes_ar: 'متاح من البداية',
+    unlock_notes_en: 'Available from the start',
+  },
+  {
+    id: 'recipe-greatball',
+    name_ar: 'صنع كرة عظيمة',
+    name_en: 'Craft Great Ball',
+    outputs: [{ item_id: 'great-ball', qty: 1 }],
+    ingredients: [
+      { item_id: 'black-tumblestone', qty: 2 },
+      { item_id: 'oran-berry', qty: 2 },
+    ],
+    unlock_notes_ar: 'يُفتح بعد الوصول للرتبة الثانية',
+    unlock_notes_en: 'Unlocks at Star Rank 2',
+  },
+  {
+    id: 'recipe-potion',
+    name_ar: 'صنع جرعة',
+    name_en: 'Craft Potion',
+    outputs: [{ item_id: 'potion', qty: 1 }],
+    ingredients: [
+      { item_id: 'oran-berry', qty: 2 },
+    ],
+    unlock_notes_ar: 'متاح من البداية',
+    unlock_notes_en: 'Available from the start',
+  },
+  {
+    id: 'recipe-superpotion',
+    name_ar: 'صنع جرعة فائقة',
+    name_en: 'Craft Super Potion',
+    outputs: [{ item_id: 'super-potion', qty: 1 }],
+    ingredients: [
+      { item_id: 'oran-berry', qty: 3 },
+      { item_id: 'potion', qty: 1 },
+    ],
+    unlock_notes_ar: 'يُفتح بعد الوصول للرتبة الثالثة',
+    unlock_notes_en: 'Unlocks at Star Rank 3',
+  },
+];
+
 export async function loadSeedData() {
   const { db } = await import('./db');
   
@@ -476,6 +526,7 @@ export async function loadSeedData() {
     db.moves.bulkAdd(seedMoves),
     db.items.bulkAdd(seedItems),
     db.requests.bulkAdd(seedRequests),
+    db.recipes.bulkAdd(seedRecipes),
   ]);
   
   console.log('Seed data loaded successfully!');
