@@ -1,12 +1,13 @@
+import { forwardRef, useState } from 'react';
 import { Pokemon } from '@/types/pokemon';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { Star } from 'lucide-react';
-import { useState } from 'react';
 import { toggleFavorite, isFavorite } from '@/lib/db';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { Link } from 'react-router-dom';
+import { getAnimatedSpriteUrl, getArtworkUrl, getArtworkFallback } from '@/lib/pokemon-images';
 
 const typeColors: Record<string, string> = {
   normal: 'from-type-normal/30 to-type-normal/10',
@@ -33,35 +34,53 @@ interface PokemonCardProps {
   pokemon: Pokemon;
 }
 
-export function PokemonCard({ pokemon }: PokemonCardProps) {
-  const { t } = useLanguage();
-  const [animateFav, setAnimateFav] = useState(false);
-  
-  const favorite = useLiveQuery(() => isFavorite('pokemon', pokemon.id), [pokemon.id]);
-  
-  const isLegendary = pokemon.tags.includes('legendary') || pokemon.tags.includes('mythical');
-  const isAlpha = pokemon.tags.includes('alpha');
-  const isNoble = pokemon.tags.includes('noble');
-  
-  const getBadgeClass = () => {
-    if (isLegendary) return 'wax-seal glow-gold';
-    if (isAlpha) return 'token-stack glow-alpha';
-    if (isNoble) return 'glow-magenta';
-    return 'bouquet-badge';
-  };
-  
-  const gradient = typeColors[pokemon.types[0]] || typeColors.normal;
-  
-  const handleFavorite = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setAnimateFav(true);
-    await toggleFavorite('pokemon', pokemon.id);
-    setTimeout(() => setAnimateFav(false), 400);
-  };
+export const PokemonCard = forwardRef<HTMLAnchorElement, PokemonCardProps>(
+  function PokemonCard({ pokemon }, ref) {
+    const { t } = useLanguage();
+    const [animateFav, setAnimateFav] = useState(false);
+    const [imgSrc, setImgSrc] = useState(() => getAnimatedSpriteUrl(pokemon.id));
+    const [imgFallbackIndex, setImgFallbackIndex] = useState(0);
+    
+    const favorite = useLiveQuery(() => isFavorite('pokemon', pokemon.id), [pokemon.id]);
+    
+    const isLegendary = pokemon.tags.includes('legendary') || pokemon.tags.includes('mythical');
+    const isAlpha = pokemon.tags.includes('alpha');
+    const isNoble = pokemon.tags.includes('noble');
+    
+    const getBadgeClass = () => {
+      if (isLegendary) return 'wax-seal glow-gold';
+      if (isAlpha) return 'token-stack glow-alpha';
+      if (isNoble) return 'glow-magenta';
+      return 'bouquet-badge';
+    };
+    
+    const gradient = typeColors[pokemon.types[0]] || typeColors.normal;
+    
+    // Image fallback chain
+    const imageFallbacks = [
+      pokemon.images.animated || getArtworkUrl(pokemon.dex_no),
+      pokemon.images.artwork,
+      getArtworkFallback(pokemon.dex_no),
+      '/placeholder.svg'
+    ];
+    
+    const handleImageError = () => {
+      if (imgFallbackIndex < imageFallbacks.length) {
+        setImgSrc(imageFallbacks[imgFallbackIndex]);
+        setImgFallbackIndex(prev => prev + 1);
+      }
+    };
+    
+    const handleFavorite = async (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setAnimateFav(true);
+      await toggleFavorite('pokemon', pokemon.id);
+      setTimeout(() => setAnimateFav(false), 400);
+    };
 
-  return (
-    <Link to={`/pokemon/${pokemon.id}`}>
+    return (
+      <Link to={`/pokemon/${pokemon.id}`} ref={ref}>
       <div className={cn(
         'group relative rounded-xl border border-border/50 bg-gradient-to-br p-4 card-hover sparkle cursor-pointer',
         gradient,
@@ -104,16 +123,11 @@ export function PokemonCard({ pokemon }: PokemonCardProps) {
         {/* Image - with animated GIF on hover */}
         <div className={cn('relative w-20 h-20 mx-auto mt-4 mb-2', getBadgeClass())}>
           <img 
-            src={pokemon.images.animated || pokemon.images.artwork} 
+            src={imgSrc} 
             alt={t(pokemon.name_ar, pokemon.name_en)}
             className="w-full h-full object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-300"
             loading="lazy"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              if (target.src !== pokemon.images.artwork) {
-                target.src = pokemon.images.artwork;
-              }
-            }}
+            onError={handleImageError}
           />
         </div>
         
@@ -148,5 +162,6 @@ export function PokemonCard({ pokemon }: PokemonCardProps) {
         </div>
       </div>
     </Link>
-  );
-}
+    );
+  }
+);

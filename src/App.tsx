@@ -6,8 +6,12 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { Header } from "@/components/Header";
 import { Navigation } from "@/components/Navigation";
-import { useEffect } from "react";
-import { reloadAllData } from "@/lib/seed-data";
+import { useEffect, useState } from "react";
+import { loadSeedData, reloadAllData } from "@/lib/seed-data";
+import { db, getDataVersion, setDataVersion } from "@/lib/db";
+
+// Current data version - increment when seed data changes
+const DATA_VERSION = "v2.0";
 
 // Pages
 import Index from "./pages/Index";
@@ -31,18 +35,33 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const App = () => {
-  // Reload data on first mount to ensure latest moves/items are loaded
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Load data on first mount - works on any route
   useEffect(() => {
-    const checkAndReload = async () => {
-      const { db } = await import('@/lib/db');
-      const movesCount = await db.moves.count();
-      const itemsCount = await db.items.count();
-      // Reload if data is outdated (old seed had only 10 moves and 10 items)
-      if (movesCount < 50 || itemsCount < 50) {
-        await reloadAllData();
+    const initializeData = async () => {
+      try {
+        const pokemonCount = await db.pokemon.count();
+        const currentVersion = await getDataVersion();
+        
+        // If no data or outdated version, reload everything
+        if (pokemonCount === 0) {
+          console.log('No data found, loading seed data...');
+          await loadSeedData();
+          await setDataVersion(DATA_VERSION);
+        } else if (currentVersion !== DATA_VERSION) {
+          console.log(`Data version mismatch (${currentVersion} vs ${DATA_VERSION}), reloading...`);
+          await reloadAllData();
+          await setDataVersion(DATA_VERSION);
+        }
+      } catch (error) {
+        console.error('Error initializing data:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
-    checkAndReload();
+    
+    initializeData();
   }, []);
 
   return (

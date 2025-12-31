@@ -1,8 +1,8 @@
+import { forwardRef, useState } from 'react';
 import { Item } from '@/types/pokemon';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
 import { Circle, Heart, Cherry, Sparkles, Hammer, Key, Package } from 'lucide-react';
 
 // PokeAPI item sprites base URL
@@ -72,81 +72,83 @@ interface ItemCardProps {
   item: Item;
 }
 
-export function ItemCard({ item }: ItemCardProps) {
-  const { t } = useLanguage();
-  const [imgError, setImgError] = useState(false);
-  const colors = typeColors[item.type] || typeColors.other;
-  const icon = typeIcons[item.type] || typeIcons.other;
-  const spriteUrl = getItemSpriteUrl(item.name_en);
+export const ItemCard = forwardRef<HTMLAnchorElement, ItemCardProps>(
+  function ItemCard({ item }, ref) {
+    const { t } = useLanguage();
+    const [imgError, setImgError] = useState(false);
+    const colors = typeColors[item.type] || typeColors.other;
+    const icon = typeIcons[item.type] || typeIcons.other;
+    const spriteUrl = getItemSpriteUrl(item.name_en);
 
-  return (
-    <Link to={`/items/${item.id}`}>
-      <div className={cn(
-        'group relative rounded-2xl border bg-gradient-to-br p-4 transition-all duration-300 cursor-pointer',
-        'hover:scale-105 hover:-translate-y-1',
-        colors.bg,
-        colors.border,
-        'hover:' + colors.glow
-      )}>
-        {/* Item Image */}
-        <div className="relative w-14 h-14 mx-auto mb-3">
-          {!imgError ? (
-            <img 
-              src={spriteUrl}
-              alt={t(item.name_ar, item.name_en)}
-              className="w-full h-full object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-125"
-              onError={() => setImgError(true)}
-              loading="lazy"
-            />
-          ) : (
-            <div className="w-full h-full rounded-xl bg-secondary/50 flex items-center justify-center">
-              {icon}
-            </div>
-          )}
-          
-          {/* Glow effect behind image */}
-          <div className={cn(
-            "absolute inset-0 -z-10 rounded-full blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-300",
-            item.type === 'pokeball' && "bg-destructive",
-            item.type === 'medicine' && "bg-type-grass",
-            item.type === 'berry' && "bg-accent",
-            item.type === 'evolution' && "bg-type-psychic",
-            item.type === 'crafting' && "bg-type-rock",
-            item.type === 'key' && "bg-gold",
-            item.type === 'other' && "bg-muted"
-          )} />
-        </div>
-
-        {/* Name */}
-        <h3 className="font-semibold text-foreground text-center text-sm truncate group-hover:text-primary transition-colors">
-          {t(item.name_ar, item.name_en)}
-        </h3>
-
-        {/* Type badge */}
-        <div className="text-center mt-2">
-          <span className={cn(
-            "inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-medium rounded-full bg-background/50 backdrop-blur-sm capitalize",
-            item.type === 'pokeball' && "text-destructive",
-            item.type === 'medicine' && "text-type-grass",
-            item.type === 'berry' && "text-accent",
-            item.type === 'evolution' && "text-type-psychic",
-            item.type === 'crafting' && "text-type-rock",
-            item.type === 'key' && "text-gold",
-            item.type === 'other' && "text-muted-foreground"
-          )}>
-            {icon}
-            {t(
-              item.type === 'pokeball' ? 'كرة' :
-              item.type === 'medicine' ? 'دواء' :
-              item.type === 'berry' ? 'توت' :
-              item.type === 'evolution' ? 'تطور' :
-              item.type === 'crafting' ? 'تصنيع' :
-              item.type === 'key' ? 'مفتاح' : 'أخرى',
-              item.type
+    return (
+      <Link to={`/items/${item.id}`} ref={ref}>
+        <div className={cn(
+          'group relative rounded-2xl border bg-gradient-to-br p-4 transition-all duration-300 cursor-pointer',
+          'hover:scale-105 hover:-translate-y-1',
+          colors.bg,
+          colors.border,
+          'hover:' + colors.glow
+        )}>
+          {/* Item Image */}
+          <div className="relative w-14 h-14 mx-auto mb-3">
+            {!imgError ? (
+              <img 
+                src={spriteUrl}
+                alt={t(item.name_ar, item.name_en)}
+                className="w-full h-full object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-125"
+                onError={() => setImgError(true)}
+                loading="lazy"
+              />
+            ) : (
+              <div className="w-full h-full rounded-xl bg-secondary/50 flex items-center justify-center">
+                {icon}
+              </div>
             )}
-          </span>
+            
+            {/* Glow effect behind image */}
+            <div className={cn(
+              "absolute inset-0 -z-10 rounded-full blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-300",
+              item.type === 'pokeball' && "bg-destructive",
+              item.type === 'medicine' && "bg-type-grass",
+              item.type === 'berry' && "bg-accent",
+              item.type === 'evolution' && "bg-type-psychic",
+              item.type === 'crafting' && "bg-type-rock",
+              item.type === 'key' && "bg-gold",
+              item.type === 'other' && "bg-muted"
+            )} />
+          </div>
+
+          {/* Name */}
+          <h3 className="font-semibold text-foreground text-center text-sm truncate group-hover:text-primary transition-colors">
+            {t(item.name_ar, item.name_en)}
+          </h3>
+
+          {/* Type badge */}
+          <div className="text-center mt-2">
+            <span className={cn(
+              "inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-medium rounded-full bg-background/50 backdrop-blur-sm capitalize",
+              item.type === 'pokeball' && "text-destructive",
+              item.type === 'medicine' && "text-type-grass",
+              item.type === 'berry' && "text-accent",
+              item.type === 'evolution' && "text-type-psychic",
+              item.type === 'crafting' && "text-type-rock",
+              item.type === 'key' && "text-gold",
+              item.type === 'other' && "text-muted-foreground"
+            )}>
+              {icon}
+              {t(
+                item.type === 'pokeball' ? 'كرة' :
+                item.type === 'medicine' ? 'دواء' :
+                item.type === 'berry' ? 'توت' :
+                item.type === 'evolution' ? 'تطور' :
+                item.type === 'crafting' ? 'تصنيع' :
+                item.type === 'key' ? 'مفتاح' : 'أخرى',
+                item.type
+              )}
+            </span>
+          </div>
         </div>
-      </div>
-    </Link>
-  );
-}
+      </Link>
+    );
+  }
+);
