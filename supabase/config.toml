@@ -1,0 +1,7 @@
+project_id = "taflnvlmmkuiifrvwkiz"
+
+[functions.pokemon-ai-chat]
+verify_jwt = false
+
+[functions.team-analysis]
+verify_jwt = false
