@@ -3,13 +3,22 @@ import type { Pokemon } from '@/types/pokemon';
 
 const SPRITE_BASE = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon';
 const ARTWORK_BASE = `${SPRITE_BASE}/other/official-artwork`;
-const ANIMATED_BASE = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown';
+const SHOWDOWN_BASE = 'https://play.pokemonshowdown.com/sprites';
 
-// Helper to generate image URLs with animated sprites
-const img = (id: number, hisuiId?: number) => ({
-  thumb: `${SPRITE_BASE}/${id}.png`,
-  artwork: `${ARTWORK_BASE}/${id}.png`,
-  animated: `${ANIMATED_BASE}/${id}.gif`,
+// Helper to generate image URLs with multiple reliable sources
+// For Hisuian forms, we use the base form's national dex number since that's what most APIs use
+const img = (nationalDexNo: number, _hisuiFormId?: number) => ({
+  thumb: `${SPRITE_BASE}/${nationalDexNo}.png`,
+  artwork: `${ARTWORK_BASE}/${nationalDexNo}.png`,
+  // Use Showdown for animated sprites - more reliable
+  animated: `${SHOWDOWN_BASE}/ani/${nationalDexNo}.gif`,
+});
+
+// For Hisuian forms, use Showdown naming convention
+const hisuiImg = (baseName: string, nationalDexNo: number) => ({
+  thumb: `${SPRITE_BASE}/${nationalDexNo}.png`,
+  artwork: `${ARTWORK_BASE}/${nationalDexNo}.png`,
+  animated: `${SHOWDOWN_BASE}/ani/${baseName}-hisui.gif`,
 });
 
 export const hisuiPokemon: Pokemon[] = [
@@ -38,7 +47,7 @@ export const hisuiPokemon: Pokemon[] = [
     stats: { hp: 88, atk: 112, def: 80, spa: 95, spd: 95, spe: 60 },
     description_ar: 'تكيف مع بيئة هيسوي الباردة، يقاتل بشراسة مستخدماً ريشه كسهام.',
     description_en: 'The fierce cold of Hisui has caused this Pokémon to evolve into a fierce fighter.',
-    evolutions: [], images: img(724, 10229), learnset: [], spawn_refs: []
+    evolutions: [], images: hisuiImg('decidueye', 724), learnset: [], spawn_refs: []
   },
   // #004 - Cyndaquil (Starter)
   {
