@@ -8,6 +8,7 @@ import { Header } from "@/components/Header";
 import { Navigation } from "@/components/Navigation";
 import Index from "./pages/Index";
 import PokemonPage from "./pages/Pokemon";
+import PokemonDetails from "./pages/PokemonDetails";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/pokemon" element={<PokemonPage />} />
+                <Route path="/pokemon/:id" element={<PokemonDetails />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
