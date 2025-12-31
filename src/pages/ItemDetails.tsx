@@ -1,7 +1,8 @@
+import { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '@/lib/db';
+import { db, addRecent } from '@/lib/db';
 import { ChevronLeft, Circle, Heart, Cherry, Sparkles, Hammer, Key, Package } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -30,6 +31,13 @@ export default function ItemDetails() {
   const { t } = useLanguage();
 
   const item = useLiveQuery(() => db.items.get(id || ''), [id]);
+
+  // Track recent view
+  useEffect(() => {
+    if (id) {
+      addRecent('item', id);
+    }
+  }, [id]);
 
   if (!item) {
     return (

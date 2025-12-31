@@ -1,7 +1,8 @@
+import { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '@/lib/db';
+import { db, addRecent } from '@/lib/db';
 import { ChevronLeft, User, MapPin, Target, ListChecks, Gift } from 'lucide-react';
 
 export default function RequestDetails() {
@@ -13,6 +14,13 @@ export default function RequestDetails() {
     () => request ? db.locations.get(request.location_id) : undefined,
     [request?.location_id]
   );
+
+  // Track recent view
+  useEffect(() => {
+    if (id) {
+      addRecent('request', id);
+    }
+  }, [id]);
 
   if (!request) {
     return (

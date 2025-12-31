@@ -1,16 +1,13 @@
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Search, Globe, Menu } from 'lucide-react';
+import { Search, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 export function Header() {
   const { lang, setLang, t } = useLanguage();
-  const [searchOpen, setSearchOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 glass border-b border-border/50 safe-area-inset">
+    <header className="fixed top-0 inset-x-0 z-50 glass border-b border-border/50 safe-area-inset">
       <div className="container flex items-center justify-between h-14 px-4">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
@@ -20,28 +17,19 @@ export function Header() {
           <span className="font-bold text-lg text-gradient hidden sm:block">PLA Dex X</span>
         </Link>
 
-        {/* Search */}
+        {/* Search Link */}
         <div className="flex-1 max-w-md mx-4">
-          {searchOpen ? (
-            <Input
-              type="search"
-              placeholder={t('بحث...', 'Search...')}
-              className="bg-secondary/50 border-border/50"
-              autoFocus
-              onBlur={() => setSearchOpen(false)}
-            />
-          ) : (
+          <Link to="/search">
             <Button
               variant="ghost"
               size="sm"
               className="w-full justify-start text-muted-foreground gap-2 bg-secondary/30"
-              onClick={() => setSearchOpen(true)}
             >
               <Search className="w-4 h-4" />
               <span className="hidden sm:inline">{t('بحث عن بوكيمون، حركات، عناصر...', 'Search Pokémon, moves, items...')}</span>
               <span className="sm:hidden">{t('بحث...', 'Search...')}</span>
             </Button>
-          )}
+          </Link>
         </div>
 
         {/* Actions */}

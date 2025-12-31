@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '@/lib/db';
+import { db, addRecent } from '@/lib/db';
 import { ChevronLeft, MapPin, Filter } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PokemonCard } from '@/components/PokemonCard';
@@ -21,6 +21,13 @@ export default function LocationDetails() {
   const [alphaOnly, setAlphaOnly] = useState(false);
 
   const location = useLiveQuery(() => db.locations.get(id || ''), [id]);
+
+  // Track recent view
+  useEffect(() => {
+    if (id) {
+      addRecent('location', id);
+    }
+  }, [id]);
   const spawns = useLiveQuery(() => 
     db.spawns.where('location_id').equals(id || '').toArray(), 
     [id]
