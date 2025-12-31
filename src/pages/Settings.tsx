@@ -10,14 +10,14 @@ import { loadSeedData } from '@/lib/seed-data';
 import { cn } from '@/lib/utils';
 
 export default function SettingsPage() {
-  const { language, setLanguage, t } = useLanguage();
+  const { lang, setLang, t } = useLanguage();
   const [reduceMotion, setReduceMotion] = useState(false);
   const [pinEnabled, setPinEnabled] = useState(false);
   const [pin, setPin] = useState('');
   const [showPinInput, setShowPinInput] = useState(false);
 
   const handleLanguageToggle = () => {
-    setLanguage(language === 'ar' ? 'en' : 'ar');
+    setLang(lang === 'ar' ? 'en' : 'ar');
   };
 
   const handleReloadSeed = async () => {
@@ -84,12 +84,12 @@ export default function SettingsPage() {
                 <div>
                   <div className="font-medium">{t('اللغة', 'Language')}</div>
                   <div className="text-sm text-muted-foreground">
-                    {language === 'ar' ? 'العربية' : 'English'}
+                    {lang === 'ar' ? 'العربية' : 'English'}
                   </div>
                 </div>
               </div>
               <Switch 
-                checked={language === 'en'} 
+                checked={lang === 'en'} 
                 onCheckedChange={handleLanguageToggle}
               />
             </div>
