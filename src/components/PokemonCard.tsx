@@ -7,7 +7,7 @@ import { toggleFavorite, isFavorite } from '@/lib/db';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { Link } from 'react-router-dom';
-import { getAnimatedSpriteUrl, getArtworkUrl, getArtworkFallback } from '@/lib/pokemon-images';
+import { getAnimatedSpriteUrl, getPokeApiArtwork, getPokemonComAsset } from '@/lib/pokemon-images';
 
 const typeColors: Record<string, string> = {
   normal: 'from-type-normal/30 to-type-normal/10',
@@ -58,9 +58,9 @@ export const PokemonCard = forwardRef<HTMLAnchorElement, PokemonCardProps>(
     
     // Image fallback chain
     const imageFallbacks = [
-      pokemon.images.animated || getArtworkUrl(pokemon.dex_no),
+      pokemon.images.animated || getPokeApiArtwork(pokemon.dex_no),
       pokemon.images.artwork,
-      getArtworkFallback(pokemon.dex_no),
+      getPokemonComAsset(pokemon.dex_no),
       '/placeholder.svg'
     ];
     
