@@ -2,9 +2,16 @@ import type { Pokemon, Move, Location, Spawn, Item, Request, Recipe } from '@/ty
 import hisuiPokemon from '@/data/hisui-pokemon';
 import { hisuiMoves } from '@/data/hisui-moves';
 import { hisuiItems } from '@/data/hisui-items';
+import { hisuiLearnsets, defaultLearnset } from '@/data/hisui-learnsets';
 
-// Re-export hisuiPokemon as seedPokemon for backward compatibility
-export const seedPokemon = hisuiPokemon;
+// Apply learnsets to Pokemon
+const pokemonWithLearnsets = hisuiPokemon.map(pokemon => ({
+  ...pokemon,
+  learnset: hisuiLearnsets[pokemon.id] || defaultLearnset
+}));
+
+// Re-export hisuiPokemon as seedPokemon with learnsets
+export const seedPokemon = pokemonWithLearnsets;
 
 export const seedLocations: Location[] = [
   {
