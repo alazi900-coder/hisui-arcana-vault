@@ -1,4 +1,4 @@
-import type { Pokemon, Move, Location, Spawn, Item } from '@/types/pokemon';
+import type { Pokemon, Move, Location, Spawn, Item, Request } from '@/types/pokemon';
 
 // Seed data with 20 Pokémon from Legends: Arceus
 export const seedPokemon: Pokemon[] = [
@@ -419,6 +419,48 @@ export const seedItems: Item[] = [
   { id: 'black-tumblestone', name_ar: 'حجر أسود', name_en: 'Black Tumblestone', type: 'crafting', description_ar: 'مادة لصنع كرات الصيد.', description_en: 'Material for crafting balls.' },
 ];
 
+export const seedRequests: Request[] = [
+  {
+    id: 'req-1',
+    title_ar: 'البوكيمون الغامض في الليل',
+    title_en: 'The Mysterious Night Pokémon',
+    giver: 'Beauregard',
+    location_id: 'obsidian-fieldlands',
+    requirements_ar: 'أمسك دريفلون',
+    requirements_en: 'Catch a Drifloon',
+    steps_ar: '1. اذهب إلى غابة خشب القلب ليلاً\n2. ابحث عن دريفلون العائم\n3. أمسكه وأعده لبوريجارد',
+    steps_en: '1. Go to Heartwood at night\n2. Look for the floating Drifloon\n3. Catch it and return to Beauregard',
+    rewards_ar: '3x توت أوران + 1000 نقدة',
+    rewards_en: '3x Oran Berry + 1000 coins',
+  },
+  {
+    id: 'req-2',
+    title_ar: 'تحدي الصخور',
+    title_en: 'The Rock Challenge',
+    giver: 'Anvin',
+    location_id: 'crimson-mirelands',
+    requirements_ar: 'هزم 3 جيودود',
+    requirements_en: 'Defeat 3 Geodude',
+    steps_ar: '1. اذهب إلى منحدر الصخور\n2. ابحث عن جيودود\n3. هزم 3 منهم في القتال',
+    steps_en: '1. Go to Bolderoll Ravine\n2. Find Geodude\n3. Defeat 3 of them in battle',
+    rewards_ar: '5x كرة عظيمة + 2000 نقدة',
+    rewards_en: '5x Great Ball + 2000 coins',
+  },
+  {
+    id: 'req-3',
+    title_ar: 'البحث عن بيكاتشو',
+    title_en: 'The Search for Pikachu',
+    giver: 'Marli',
+    location_id: 'obsidian-fieldlands',
+    requirements_ar: 'أمسك بيكاتشو',
+    requirements_en: 'Catch a Pikachu',
+    steps_ar: '1. انتظر حتى تأتي عاصفة\n2. اذهب إلى طبيعة البرق\n3. ابحث عن بيكاتشو وأمسكه',
+    steps_en: '1. Wait for a storm\n2. Go to Nature\'s Pantry\n3. Find and catch Pikachu',
+    rewards_ar: '1x حجر الرعد + 3000 نقدة',
+    rewards_en: '1x Thunder Stone + 3000 coins',
+  },
+];
+
 export async function loadSeedData() {
   const { db } = await import('./db');
   
@@ -433,6 +475,7 @@ export async function loadSeedData() {
     db.spawns.bulkAdd(seedSpawns),
     db.moves.bulkAdd(seedMoves),
     db.items.bulkAdd(seedItems),
+    db.requests.bulkAdd(seedRequests),
   ]);
   
   console.log('Seed data loaded successfully!');
