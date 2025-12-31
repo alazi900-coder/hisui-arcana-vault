@@ -12,7 +12,7 @@ import { loadSeedData, reloadAllData } from "@/lib/seed-data";
 import { db, getDataVersion, setDataVersion } from "@/lib/db";
 
 // Current data version - increment when seed data changes
-const DATA_VERSION = "v2.0";
+const DATA_VERSION = "v2.1";
 
 // Pages
 import Index from "./pages/Index";

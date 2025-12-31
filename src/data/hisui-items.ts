@@ -83,7 +83,9 @@ export const hisuiItems: Item[] = [
   { id: 'hearty-grains', name_ar: 'حبوب صحية', name_en: 'Hearty Grains', type: 'crafting', description_ar: 'حبوب لصنع الكعك.', description_en: 'Grains for crafting cakes.' },
   { id: 'plump-beans', name_ar: 'فاصولياء سمينة', name_en: 'Plump Beans', type: 'crafting', description_ar: 'فاصولياء لصنع الكعك.', description_en: 'Beans for crafting cakes.' },
   { id: 'sand-radish', name_ar: 'فجل رملي', name_en: 'Sand Radish', type: 'crafting', description_ar: 'فجل لصنع عناصر الأرض.', description_en: 'A radish for ground-type items.' },
-  { id: 'kings-leaf', name_ar: 'ورقة الملك', name_en: 'King\'s Leaf', type: 'crafting', description_ar: 'ورقة نادرة للتصنيع.', description_en: 'A rare leaf for crafting.' },
+  { id: 'kings-leaf', name_ar: 'ورقة الملك', name_en: "King's Leaf", type: 'crafting', description_ar: 'ورقة نادرة للتصنيع المتقدم.', description_en: 'A rare leaf for advanced crafting.' },
+  { id: 'bugwort', name_ar: 'عشبة الحشرات', name_en: 'Bugwort', type: 'crafting', description_ar: 'عشبة لصنع رذاذ التخفي.', description_en: 'An herb for crafting stealth sprays.' },
+  { id: 'springy-mushroom', name_ar: 'فطر نابض', name_en: 'Springy Mushroom', type: 'crafting', description_ar: 'فطر لصنع الكعك المميز.', description_en: 'A mushroom for crafting special cakes.' },
 
   // ===== KEY ITEMS =====
   { id: 'celestica-flute', name_ar: 'ناي سيليستيكا', name_en: 'Celestica Flute', type: 'key', description_ar: 'ناي قديم يستدعي ويريان.', description_en: 'An ancient flute that summons Wyrdeer.' },
@@ -106,10 +108,12 @@ export const hisuiItems: Item[] = [
   { id: 'smoke-bomb', name_ar: 'قنبلة دخانية', name_en: 'Smoke Bomb', type: 'other', description_ar: 'تخلق ضباباً للهروب من البوكيمون.', description_en: 'Creates a smokescreen to escape Pokémon.' },
   { id: 'scatter-bang', name_ar: 'انفجار مبعثر', name_en: 'Scatter Bang', type: 'other', description_ar: 'تفزع البوكيمون القريب.', description_en: 'Startles nearby Pokémon.' },
   { id: 'sticky-glob', name_ar: 'كرة لزجة', name_en: 'Sticky Glob', type: 'other', description_ar: 'تبطئ البوكيمون المصاب.', description_en: 'Slows down hit Pokémon.' },
+  { id: 'stealth-spray', name_ar: 'رذاذ التخفي', name_en: 'Stealth Spray', type: 'other', description_ar: 'يجعلك غير مرئي للبوكيمون لفترة قصيرة.', description_en: 'Makes you invisible to Pokémon briefly.' },
   { id: 'mud-ball', name_ar: 'كرة طين', name_en: 'Mud Ball', type: 'other', description_ar: 'تلهي البوكيمون لفترة وجيزة.', description_en: 'Distracts Pokémon briefly.' },
   { id: 'snow-ball', name_ar: 'كرة ثلج', name_en: 'Snow Ball', type: 'other', description_ar: 'تلهي البوكيمون في المناطق الباردة.', description_en: 'Distracts Pokémon in cold areas.' },
   { id: 'cake-lure', name_ar: 'طعم كعك', name_en: 'Cake-Lure', type: 'other', description_ar: 'تجذب البوكيمون إلى الموقع.', description_en: 'Lures Pokémon to a location.' },
   { id: 'honey-cake', name_ar: 'كعكة العسل', name_en: 'Honey Cake', type: 'other', description_ar: 'تجذب البوكيمون بفعالية أكبر.', description_en: 'Lures Pokémon more effectively.' },
+  { id: 'mushroom-cake', name_ar: 'كعكة الفطر', name_en: 'Mushroom Cake', type: 'other', description_ar: 'تجذب بوكيمون العشب والسم.', description_en: 'Lures Grass and Poison Pokémon.' },
   { id: 'grain-cake', name_ar: 'كعكة الحبوب', name_en: 'Grain Cake', type: 'other', description_ar: 'تجذب أنواعاً معينة من البوكيمون.', description_en: 'Lures certain types of Pokémon.' },
   { id: 'bean-cake', name_ar: 'كعكة الفاصولياء', name_en: 'Bean Cake', type: 'other', description_ar: 'تجذب أنواعاً معينة من البوكيمون.', description_en: 'Lures certain types of Pokémon.' },
   { id: 'salt-cake', name_ar: 'كعكة الملح', name_en: 'Salt Cake', type: 'other', description_ar: 'تجذب بوكيمون الصخور والفولاذ.', description_en: 'Lures Rock and Steel Pokémon.' },
