@@ -15,6 +15,7 @@ import MovesPage from "./pages/Moves";
 import MoveDetails from "./pages/MoveDetails";
 import ItemsPage from "./pages/Items";
 import ItemDetails from "./pages/ItemDetails";
+import RecipesPage from "./pages/Recipes";
 import LocationsPage from "./pages/Locations";
 import LocationDetails from "./pages/LocationDetails";
 import RequestsPage from "./pages/Requests";
@@ -47,6 +48,8 @@ const App = () => (
                 {/* Items */}
                 <Route path="/items" element={<ItemsPage />} />
                 <Route path="/items/:id" element={<ItemDetails />} />
+                {/* Recipes */}
+                <Route path="/recipes" element={<RecipesPage />} />
                 {/* Locations */}
                 <Route path="/locations" element={<LocationsPage />} />
                 <Route path="/locations/:id" element={<LocationDetails />} />
