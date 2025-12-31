@@ -3,11 +3,13 @@ import type { Pokemon } from '@/types/pokemon';
 
 const SPRITE_BASE = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon';
 const ARTWORK_BASE = `${SPRITE_BASE}/other/official-artwork`;
+const ANIMATED_BASE = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown';
 
-// Helper to generate image URLs
+// Helper to generate image URLs with animated sprites
 const img = (id: number, hisuiId?: number) => ({
-  thumb: `${SPRITE_BASE}/${hisuiId || id}.png`,
-  artwork: `${ARTWORK_BASE}/${hisuiId || id}.png`,
+  thumb: `${SPRITE_BASE}/${id}.png`,
+  artwork: `${ARTWORK_BASE}/${id}.png`,
+  animated: `${ANIMATED_BASE}/${id}.gif`,
 });
 
 export const hisuiPokemon: Pokemon[] = [
