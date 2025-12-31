@@ -7,7 +7,7 @@ import { PokemonCard } from '@/components/PokemonCard';
 import { Link } from 'react-router-dom';
 import { 
   Grid3X3, Swords, Package, MapPin, ClipboardList, GitCompare, 
-  Upload, Sparkles, Crown, Zap, FlaskConical, Clock, Search
+  Upload, Sparkles, Crown, Zap, FlaskConical, Clock, Search, Map
 } from 'lucide-react';
 
 const quickLinks = [
@@ -16,9 +16,10 @@ const quickLinks = [
   { path: '/items', icon: Package, labelAr: 'العناصر', labelEn: 'Items', color: 'bg-accent/20 text-accent' },
   { path: '/recipes', icon: FlaskConical, labelAr: 'الوصفات', labelEn: 'Recipes', color: 'bg-type-poison/20 text-type-poison' },
   { path: '/locations', icon: MapPin, labelAr: 'المواقع', labelEn: 'Locations', color: 'bg-type-grass/20 text-type-grass' },
+  { path: '/map', icon: Map, labelAr: 'الخريطة', labelEn: 'Map', color: 'bg-type-water/20 text-type-water' },
   { path: '/requests', icon: ClipboardList, labelAr: 'المهام', labelEn: 'Requests', color: 'bg-type-psychic/20 text-type-psychic' },
   { path: '/compare', icon: GitCompare, labelAr: 'المقارنة', labelEn: 'Compare', color: 'bg-gold/20 text-gold' },
-  { path: '/search', icon: Search, labelAr: 'البحث', labelEn: 'Search', color: 'bg-type-water/20 text-type-water' },
+  { path: '/search', icon: Search, labelAr: 'البحث', labelEn: 'Search', color: 'bg-type-electric/20 text-type-electric' },
 ];
 
 const typeIcons: Record<string, React.ElementType> = {
@@ -122,7 +123,7 @@ export default function Index() {
 
         {/* Quick Links */}
         <div className="grid grid-cols-3 gap-3 mb-6">
-          {quickLinks.map((link, i) => (
+          {quickLinks.slice(0, 9).map((link, i) => (
             <Link 
               key={link.path} 
               to={link.path}
