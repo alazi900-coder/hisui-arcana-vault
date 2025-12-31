@@ -1,5 +1,7 @@
 import type { Pokemon, Move, Location, Spawn, Item, Request, Recipe } from '@/types/pokemon';
 import hisuiPokemon from '@/data/hisui-pokemon';
+import { hisuiMoves } from '@/data/hisui-moves';
+import { hisuiItems } from '@/data/hisui-items';
 
 // Re-export hisuiPokemon as seedPokemon for backward compatibility
 export const seedPokemon = hisuiPokemon;
@@ -89,31 +91,11 @@ export const seedSpawns: Spawn[] = [
   { id: 'spawn-arceus-1', pokemon_id: 'arceus', location_id: 'coronet-highlands', area_ar: 'قمة كورونيت', area_en: 'Coronet Peak', conditions_ar: 'بعد إكمال كل شيء', conditions_en: 'After completing everything', rarity: 'very_rare', is_alpha: false },
 ];
 
-export const seedMoves: Move[] = [
-  { id: 'tackle', name_ar: 'صدم', name_en: 'Tackle', type: 'normal', category: 'physical', power: 40, accuracy: 100, pp: 35, description_ar: 'يصدم الخصم بكامل جسمه.', description_en: 'A full-body charge attack.' },
-  { id: 'ember', name_ar: 'جمرة', name_en: 'Ember', type: 'fire', category: 'special', power: 40, accuracy: 100, pp: 25, description_ar: 'يُطلق شرارات نارية صغيرة.', description_en: 'Attacks with small flames.' },
-  { id: 'water-gun', name_ar: 'مسدس الماء', name_en: 'Water Gun', type: 'water', category: 'special', power: 40, accuracy: 100, pp: 25, description_ar: 'يُطلق نفث ماء قوي.', description_en: 'Squirts water at the target.' },
-  { id: 'thunder-shock', name_ar: 'صدمة الرعد', name_en: 'Thunder Shock', type: 'electric', category: 'special', power: 40, accuracy: 100, pp: 30, description_ar: 'صدمة كهربائية قد تسبب الشلل.', description_en: 'An electric shock that may paralyze.' },
-  { id: 'vine-whip', name_ar: 'سوط الكرمة', name_en: 'Vine Whip', type: 'grass', category: 'physical', power: 45, accuracy: 100, pp: 25, description_ar: 'يضرب بكروم رفيعة.', description_en: 'Strikes with thin vines.' },
-  { id: 'psychic', name_ar: 'نفسي', name_en: 'Psychic', type: 'psychic', category: 'special', power: 90, accuracy: 100, pp: 10, description_ar: 'موجة نفسية قوية.', description_en: 'A strong psychic wave.' },
-  { id: 'shadow-ball', name_ar: 'كرة الظل', name_en: 'Shadow Ball', type: 'ghost', category: 'special', power: 80, accuracy: 100, pp: 15, description_ar: 'يُطلق كرة من الظلام.', description_en: 'Launches a shadowy blob.' },
-  { id: 'rock-slide', name_ar: 'انهيار صخري', name_en: 'Rock Slide', type: 'rock', category: 'physical', power: 75, accuracy: 90, pp: 10, description_ar: 'يُسقط صخوراً على الخصم.', description_en: 'Drops rocks on the foe.' },
-  { id: 'dragon-pulse', name_ar: 'نبضة التنين', name_en: 'Dragon Pulse', type: 'dragon', category: 'special', power: 85, accuracy: 100, pp: 10, description_ar: 'موجة طاقة تنينية.', description_en: 'A dragon energy wave.' },
-  { id: 'flamethrower', name_ar: 'قاذف اللهب', name_en: 'Flamethrower', type: 'fire', category: 'special', power: 90, accuracy: 100, pp: 15, description_ar: 'يُطلق لهباً حارقاً.', description_en: 'Scorches the target with fire.' },
-];
+// Use comprehensive moves data from hisui-moves.ts
+export const seedMoves: Move[] = hisuiMoves;
 
-export const seedItems: Item[] = [
-  { id: 'poke-ball', name_ar: 'كرة بوكي', name_en: 'Poké Ball', type: 'pokeball', description_ar: 'كرة لصيد البوكيمون.', description_en: 'A ball for catching Pokémon.' },
-  { id: 'great-ball', name_ar: 'كرة عظيمة', name_en: 'Great Ball', type: 'pokeball', description_ar: 'كرة أفضل من الكرة العادية.', description_en: 'A better ball than a Poké Ball.' },
-  { id: 'ultra-ball', name_ar: 'كرة فائقة', name_en: 'Ultra Ball', type: 'pokeball', description_ar: 'كرة ممتازة لصيد البوكيمون.', description_en: 'An excellent ball for catching.' },
-  { id: 'potion', name_ar: 'جرعة', name_en: 'Potion', type: 'medicine', description_ar: 'تستعيد 20 نقطة صحة.', description_en: 'Restores 20 HP.' },
-  { id: 'super-potion', name_ar: 'جرعة فائقة', name_en: 'Super Potion', type: 'medicine', description_ar: 'تستعيد 60 نقطة صحة.', description_en: 'Restores 60 HP.' },
-  { id: 'oran-berry', name_ar: 'توت أوران', name_en: 'Oran Berry', type: 'berry', description_ar: 'توت يستعيد 10 صحة.', description_en: 'A berry that restores 10 HP.' },
-  { id: 'fire-stone', name_ar: 'حجر النار', name_en: 'Fire Stone', type: 'evolution', description_ar: 'حجر يُطور بعض البوكيمونات.', description_en: 'Evolves certain Pokémon.' },
-  { id: 'thunder-stone', name_ar: 'حجر الرعد', name_en: 'Thunder Stone', type: 'evolution', description_ar: 'حجر يُطور بعض البوكيمونات.', description_en: 'Evolves certain Pokémon.' },
-  { id: 'water-stone', name_ar: 'حجر الماء', name_en: 'Water Stone', type: 'evolution', description_ar: 'حجر يُطور بعض البوكيمونات.', description_en: 'Evolves certain Pokémon.' },
-  { id: 'black-tumblestone', name_ar: 'حجر أسود', name_en: 'Black Tumblestone', type: 'crafting', description_ar: 'مادة لصنع كرات الصيد.', description_en: 'Material for crafting balls.' },
-];
+// Use comprehensive items data from hisui-items.ts
+export const seedItems: Item[] = hisuiItems;
 
 export const seedRequests: Request[] = [
   {

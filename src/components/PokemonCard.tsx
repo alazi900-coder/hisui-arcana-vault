@@ -101,13 +101,19 @@ export function PokemonCard({ pokemon }: PokemonCardProps) {
           )}
         </div>
         
-        {/* Image */}
+        {/* Image - with animated GIF on hover */}
         <div className={cn('relative w-20 h-20 mx-auto mt-4 mb-2', getBadgeClass())}>
           <img 
-            src={pokemon.images.artwork} 
+            src={pokemon.images.animated || pokemon.images.artwork} 
             alt={t(pokemon.name_ar, pokemon.name_en)}
             className="w-full h-full object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-300"
             loading="lazy"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              if (target.src !== pokemon.images.artwork) {
+                target.src = pokemon.images.artwork;
+              }
+            }}
           />
         </div>
         

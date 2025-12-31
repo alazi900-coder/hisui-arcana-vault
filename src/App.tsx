@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { Header } from "@/components/Header";
 import { Navigation } from "@/components/Navigation";
+import { useEffect } from "react";
+import { reloadAllData } from "@/lib/seed-data";
 
 // Pages
 import Index from "./pages/Index";
@@ -28,7 +30,22 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const App = () => (
+const App = () => {
+  // Reload data on first mount to ensure latest moves/items are loaded
+  useEffect(() => {
+    const checkAndReload = async () => {
+      const { db } = await import('@/lib/db');
+      const movesCount = await db.moves.count();
+      const itemsCount = await db.items.count();
+      // Reload if data is outdated (old seed had only 10 moves and 10 items)
+      if (movesCount < 50 || itemsCount < 50) {
+        await reloadAllData();
+      }
+    };
+    checkAndReload();
+  }, []);
+
+  return (
   <QueryClientProvider client={queryClient}>
     <LanguageProvider>
       <TooltipProvider>
@@ -73,6 +90,7 @@ const App = () => (
       </TooltipProvider>
     </LanguageProvider>
   </QueryClientProvider>
-);
+  );
+};
 
 export default App;
