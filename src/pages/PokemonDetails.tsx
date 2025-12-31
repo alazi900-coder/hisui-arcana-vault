@@ -11,7 +11,7 @@ import {
   MapPin, Swords, Info, BarChart3, GitBranch
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { Pokemon, Spawn, Location } from '@/types/pokemon';
+import type { Pokemon, Spawn, Location, Move, LearnsetEntry } from '@/types/pokemon';
 
 const typeColors: Record<string, string> = {
   normal: 'bg-type-normal', fire: 'bg-type-fire', water: 'bg-type-water',
@@ -109,6 +109,84 @@ function EvolutionChain({ pokemon, evolutions }: { pokemon: Pokemon; evolutions:
   );
 }
 
+function MovesList({ learnset, moves }: { learnset: LearnsetEntry[]; moves: Move[] }) {
+  const { t } = useLanguage();
+  
+  if (learnset.length === 0) {
+    return (
+      <div className="text-center py-8 text-muted-foreground">
+        {t('لا توجد حركات', 'No moves available')}
+      </div>
+    );
+  }
+
+  const methodLabels = {
+    level: { ar: 'مستوى', en: 'Level' },
+    tutor: { ar: 'معلم', en: 'Tutor' },
+    evolution: { ar: 'تطور', en: 'Evolution' },
+  };
+
+  const categoryIcons = {
+    physical: '⚔️',
+    special: '✨',
+    status: '🔮',
+  };
+
+  // Sort learnset by method then level
+  const sortedLearnset = [...learnset].sort((a, b) => {
+    if (a.method === 'level' && b.method === 'level') {
+      return (a.level || 0) - (b.level || 0);
+    }
+    if (a.method === 'level') return -1;
+    if (b.method === 'level') return 1;
+    if (a.method === 'tutor') return -1;
+    if (b.method === 'tutor') return 1;
+    return 0;
+  });
+
+  return (
+    <div className="space-y-2">
+      {sortedLearnset.map((entry, idx) => {
+        const move = moves.find(m => m.id === entry.move_id);
+        if (!move) return null;
+        
+        return (
+          <Link
+            key={`${entry.move_id}-${idx}`}
+            to={`/moves/${move.id}`}
+            className="block p-3 rounded-xl bg-secondary/30 border border-border/50 hover:bg-secondary/50 transition-colors"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <span 
+                  className="px-2 py-0.5 text-xs font-medium rounded-full text-white capitalize"
+                  style={{ backgroundColor: `hsl(var(--type-${move.type}))` }}
+                >
+                  {move.type}
+                </span>
+                <span className="font-medium">{t(move.name_ar, move.name_en)}</span>
+              </div>
+              <span className="text-lg">{categoryIcons[move.category]}</span>
+            </div>
+            
+            <div className="flex items-center gap-4 text-xs text-muted-foreground">
+              <span className="px-2 py-0.5 rounded bg-secondary">
+                {entry.method === 'level' && entry.level 
+                  ? `${t(methodLabels.level.ar, methodLabels.level.en)} ${entry.level}`
+                  : t(methodLabels[entry.method].ar, methodLabels[entry.method].en)
+                }
+              </span>
+              {move.power && <span>⚡ {move.power}</span>}
+              {move.accuracy && <span>🎯 {move.accuracy}%</span>}
+              {move.pp && <span>PP: {move.pp}</span>}
+            </div>
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
+
 function LocationsList({ spawns, locations }: { spawns: Spawn[]; locations: Location[] }) {
   const { t } = useLanguage();
   
@@ -194,6 +272,8 @@ export default function PokemonDetails() {
   , [id]);
 
   const locations = useLiveQuery(() => db.locations.toArray(), []);
+
+  const allMoves = useLiveQuery(() => db.moves.toArray(), []);
 
   const evolutionPokemon = useLiveQuery(async () => {
     if (!pokemon) return [];
@@ -353,7 +433,7 @@ export default function PokemonDetails() {
       {/* Tabs */}
       <div className="container px-4">
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-4">
+          <TabsList className="grid w-full grid-cols-5 mb-4">
             <TabsTrigger value="overview" className="gap-1 text-xs">
               <Info className="w-3 h-3" />
               {t('عام', 'Info')}
@@ -361,6 +441,10 @@ export default function PokemonDetails() {
             <TabsTrigger value="stats" className="gap-1 text-xs">
               <BarChart3 className="w-3 h-3" />
               {t('إحصائيات', 'Stats')}
+            </TabsTrigger>
+            <TabsTrigger value="moves" className="gap-1 text-xs">
+              <Swords className="w-3 h-3" />
+              {t('حركات', 'Moves')}
             </TabsTrigger>
             <TabsTrigger value="evolution" className="gap-1 text-xs">
               <GitBranch className="w-3 h-3" />
@@ -410,6 +494,11 @@ export default function PokemonDetails() {
               <div className="text-3xl font-bold text-primary">{bst}</div>
               <div className="text-sm text-muted-foreground">{t('مجموع الإحصائيات الأساسية', 'Base Stat Total')}</div>
             </div>
+          </TabsContent>
+
+          {/* Moves Tab */}
+          <TabsContent value="moves">
+            <MovesList learnset={pokemon.learnset || []} moves={allMoves || []} />
           </TabsContent>
 
           {/* Evolution Tab */}
