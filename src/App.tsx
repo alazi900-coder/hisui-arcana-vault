@@ -21,6 +21,7 @@ import LocationDetails from "./pages/LocationDetails";
 import RequestsPage from "./pages/Requests";
 import RequestDetails from "./pages/RequestDetails";
 import ComparePage from "./pages/Compare";
+import SearchPage from "./pages/Search";
 import SettingsPage from "./pages/Settings";
 import DataImportPage from "./pages/DataImport";
 import NotFound from "./pages/NotFound";
@@ -58,6 +59,7 @@ const App = () => (
                 <Route path="/requests/:id" element={<RequestDetails />} />
                 {/* Tools */}
                 <Route path="/compare" element={<ComparePage />} />
+                <Route path="/search" element={<SearchPage />} />
                 <Route path="/data-import" element={<DataImportPage />} />
                 {/* Settings */}
                 <Route path="/settings" element={<SettingsPage />} />

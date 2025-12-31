@@ -1,7 +1,8 @@
+import { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '@/lib/db';
+import { db, addRecent } from '@/lib/db';
 import { ChevronLeft, ChevronRight, Sword, Sparkles, CircleDot, Zap, Target, Battery } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -10,6 +11,13 @@ export default function MoveDetails() {
   const { t } = useLanguage();
 
   const move = useLiveQuery(() => db.moves.get(id || ''), [id]);
+
+  // Track recent view
+  useEffect(() => {
+    if (id) {
+      addRecent('move', id);
+    }
+  }, [id]);
   const allMoves = useLiveQuery(() => db.moves.toArray(), []);
 
   if (!move) {
