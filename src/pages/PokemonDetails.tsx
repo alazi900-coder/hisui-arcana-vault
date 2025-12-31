@@ -433,60 +433,108 @@ function MovesList({ learnset, moves }: { learnset: LearnsetEntry[]; moves: Move
         {t(`عرض ${filteredAndSortedMoves.length} من ${learnset.length} حركة`, `Showing ${filteredAndSortedMoves.length} of ${learnset.length} moves`)}
       </div>
       
-      {/* Moves List */}
-      <div className="space-y-2">
+      {/* Moves List - Enhanced Design */}
+      <div className="space-y-3">
         {filteredAndSortedMoves.map((entry, idx) => {
           const move = moves.find(m => m.id === entry.move_id);
           if (!move) return null;
+          
+          const typeColor = `hsl(var(--type-${move.type}))`;
           
           return (
             <Link
               key={`${entry.move_id}-${idx}`}
               to={`/moves/${move.id}`}
-              className="block p-3 rounded-xl bg-secondary/30 border border-border/50 hover:bg-secondary/50 transition-all hover:scale-[1.01] animate-fade-in-up"
-              style={{ animationDelay: `${Math.min(idx * 50, 300)}ms` }}
+              className="block group"
             >
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <span 
-                    className="px-2.5 py-1 text-xs font-bold rounded-full text-white capitalize shadow-lg transition-transform hover:scale-110"
-                    style={{ 
-                      backgroundColor: `hsl(var(--type-${move.type}))`,
-                      boxShadow: `0 2px 8px hsl(var(--type-${move.type}) / 0.4)`
-                    }}
-                  >
-                    {move.type}
-                  </span>
-                  <span className="font-medium">{t(move.name_ar, move.name_en)}</span>
+              <div 
+                className="relative p-4 rounded-2xl border border-border/30 bg-gradient-to-r from-secondary/40 to-secondary/20 hover:from-secondary/60 hover:to-secondary/40 transition-all duration-300 hover:scale-[1.02] animate-fade-in overflow-hidden"
+                style={{ 
+                  animationDelay: `${Math.min(idx * 50, 300)}ms`,
+                  boxShadow: `inset 0 0 30px ${typeColor}15`
+                }}
+              >
+                {/* Type glow accent */}
+                <div 
+                  className="absolute top-0 start-0 w-1.5 h-full rounded-s-2xl"
+                  style={{ backgroundColor: typeColor }}
+                />
+                
+                <div className="flex items-center justify-between ps-3">
+                  {/* Left side - Move info */}
+                  <div className="flex items-center gap-4">
+                    {/* Type badge with glow */}
+                    <div 
+                      className="w-12 h-12 rounded-xl flex items-center justify-center text-white text-xs font-bold uppercase shadow-lg transition-transform group-hover:scale-110"
+                      style={{ 
+                        backgroundColor: typeColor,
+                        boxShadow: `0 4px 20px ${typeColor}50`
+                      }}
+                    >
+                      {move.type.slice(0, 3)}
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-bold text-lg text-foreground group-hover:text-primary transition-colors">
+                        {t(move.name_ar, move.name_en)}
+                      </h4>
+                      <div className="flex items-center gap-3 mt-1">
+                        {/* Learning method badge */}
+                        <span 
+                          className={cn(
+                            "px-2.5 py-1 text-xs font-semibold rounded-full",
+                            entry.method === 'level' && "bg-primary/20 text-primary",
+                            entry.method === 'tutor' && "bg-type-psychic/20 text-type-psychic",
+                            entry.method === 'evolution' && "bg-gold/20 text-gold"
+                          )}
+                        >
+                          {entry.method === 'level' && entry.level 
+                            ? `${t('مستوى', 'Lv.')} ${entry.level}`
+                            : t(methodLabels[entry.method].ar, methodLabels[entry.method].en)
+                          }
+                        </span>
+                        
+                        {/* Category icon */}
+                        <span className="text-lg">{categoryIcons[move.category]}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Right side - Stats */}
+                  <div className="flex items-center gap-4">
+                    {move.power && (
+                      <div className="text-center">
+                        <div className="text-xs text-muted-foreground">{t('قوة', 'PWR')}</div>
+                        <div className="text-xl font-bold text-type-fire">{move.power}</div>
+                      </div>
+                    )}
+                    {move.accuracy && (
+                      <div className="text-center">
+                        <div className="text-xs text-muted-foreground">{t('دقة', 'ACC')}</div>
+                        <div className="text-xl font-bold text-type-water">{move.accuracy}%</div>
+                      </div>
+                    )}
+                    {move.pp && (
+                      <div className="text-center">
+                        <div className="text-xs text-muted-foreground">PP</div>
+                        <div className="text-xl font-bold text-primary">{move.pp}</div>
+                      </div>
+                    )}
+                    
+                    <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                  </div>
                 </div>
-                <span className="text-xl">{categoryIcons[move.category]}</span>
-              </div>
-              
-              <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                <span className="px-2 py-0.5 rounded bg-secondary font-medium">
-                  {entry.method === 'level' && entry.level 
-                    ? `Lv. ${entry.level}`
-                    : t(methodLabels[entry.method].ar, methodLabels[entry.method].en)
-                  }
-                </span>
-                {move.power && (
-                  <span className="flex items-center gap-1">
-                    <span className="text-type-fire">⚡</span> {move.power}
-                  </span>
-                )}
-                {move.accuracy && (
-                  <span className="flex items-center gap-1">
-                    <span>🎯</span> {move.accuracy}%
-                  </span>
-                )}
-                {move.pp && (
-                  <span className="text-primary">PP {move.pp}</span>
-                )}
               </div>
             </Link>
           );
         })}
       </div>
+      
+      {filteredAndSortedMoves.length === 0 && (
+        <div className="text-center py-8 text-muted-foreground">
+          {t('لا توجد حركات مطابقة', 'No matching moves')}
+        </div>
+      )}
     </div>
   );
 }
