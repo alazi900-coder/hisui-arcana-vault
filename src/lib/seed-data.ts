@@ -77,26 +77,8 @@ export const seedLocations: Location[] = [
   },
 ];
 
-export const seedSpawns: Spawn[] = [
-  { id: 'spawn-rowlet-1', pokemon_id: 'rowlet', location_id: 'obsidian-fieldlands', area_ar: 'ساحة آسباراتيون', area_en: 'Aspiration Hill', conditions_ar: 'نهاراً', conditions_en: 'During the day', rarity: 'uncommon', is_alpha: false },
-  { id: 'spawn-bidoof-1', pokemon_id: 'bidoof', location_id: 'obsidian-fieldlands', area_ar: 'ساحة آسباراتيون', area_en: 'Aspiration Hill', conditions_ar: 'دائماً', conditions_en: 'Always', rarity: 'common', is_alpha: false },
-  { id: 'spawn-starly-1', pokemon_id: 'starly', location_id: 'obsidian-fieldlands', area_ar: 'ساحة آسباراتيون', area_en: 'Aspiration Hill', conditions_ar: 'دائماً', conditions_en: 'Always', rarity: 'common', is_alpha: false },
-  { id: 'spawn-shinx-1', pokemon_id: 'shinx', location_id: 'obsidian-fieldlands', area_ar: 'غابة خشب القلب', area_en: 'Heartwood', conditions_ar: 'نهاراً', conditions_en: 'During the day', rarity: 'uncommon', is_alpha: false },
-  { id: 'spawn-ponyta-1', pokemon_id: 'ponyta', location_id: 'obsidian-fieldlands', area_ar: 'ساحة الحصان', area_en: 'Horseshoe Plains', conditions_ar: 'دائماً', conditions_en: 'Always', rarity: 'common', is_alpha: false },
-  { id: 'spawn-eevee-1', pokemon_id: 'eevee', location_id: 'obsidian-fieldlands', area_ar: 'غابة خشب القلب', area_en: 'Heartwood', conditions_ar: 'نهاراً', conditions_en: 'During the day', rarity: 'rare', is_alpha: false },
-  { id: 'spawn-pikachu-1', pokemon_id: 'pikachu', location_id: 'obsidian-fieldlands', area_ar: 'طبيعة البرق', area_en: "Nature's Pantry", conditions_ar: 'أثناء العواصف', conditions_en: 'During storms', rarity: 'rare', is_alpha: false },
-  { id: 'spawn-gastly-1', pokemon_id: 'gastly', location_id: 'obsidian-fieldlands', area_ar: 'قلعة الخراب', area_en: 'Ruined Heap', conditions_ar: 'ليلاً', conditions_en: 'At night', rarity: 'uncommon', is_alpha: false },
-  { id: 'spawn-abra-1', pokemon_id: 'abra', location_id: 'obsidian-fieldlands', area_ar: 'بحيرة الحق', area_en: 'Lake Verity', conditions_ar: 'دائماً', conditions_en: 'Always', rarity: 'rare', is_alpha: false },
-  { id: 'spawn-machop-1', pokemon_id: 'machop', location_id: 'crimson-mirelands', area_ar: 'تلال الكهف', area_en: 'Bolderoll Slope', conditions_ar: 'دائماً', conditions_en: 'Always', rarity: 'uncommon', is_alpha: false },
-  { id: 'spawn-geodude-1', pokemon_id: 'geodude', location_id: 'crimson-mirelands', area_ar: 'منحدر الصخور', area_en: 'Bolderoll Ravine', conditions_ar: 'دائماً', conditions_en: 'Always', rarity: 'common', is_alpha: false },
-  { id: 'spawn-drifloon-1', pokemon_id: 'drifloon', location_id: 'obsidian-fieldlands', area_ar: 'غابة خشب القلب', area_en: 'Heartwood', conditions_ar: 'ليلاً', conditions_en: 'At night', rarity: 'uncommon', is_alpha: false },
-  { id: 'spawn-hgrowlithe-1', pokemon_id: 'hisuian-growlithe', location_id: 'cobalt-coastlands', area_ar: 'جزيرة الطوفان', area_en: 'Firespit Island', conditions_ar: 'دائماً', conditions_en: 'Always', rarity: 'uncommon', is_alpha: false },
-  { id: 'spawn-kleavor-1', pokemon_id: 'kleavor', location_id: 'obsidian-fieldlands', area_ar: 'ساحة الكليفور', area_en: 'Grandtree Arena', conditions_ar: 'بعد هزيمته', conditions_en: 'After defeating it', rarity: 'very_rare', is_alpha: false },
-  { id: 'spawn-alpha-snorlax-1', pokemon_id: 'snorlax', location_id: 'obsidian-fieldlands', area_ar: 'بحيرة الحق', area_en: 'Lake Verity', conditions_ar: 'ثابت', conditions_en: 'Static spawn', rarity: 'very_rare', is_alpha: true },
-  { id: 'spawn-dialga-1', pokemon_id: 'dialga-origin', location_id: 'coronet-highlands', area_ar: 'معبد سينجو', area_en: 'Sinnoh Temple', conditions_ar: 'بعد إكمال القصة', conditions_en: 'After completing the story', rarity: 'very_rare', is_alpha: false },
-  { id: 'spawn-palkia-1', pokemon_id: 'palkia-origin', location_id: 'coronet-highlands', area_ar: 'معبد سينجو', area_en: 'Sinnoh Temple', conditions_ar: 'بعد إكمال القصة', conditions_en: 'After completing the story', rarity: 'very_rare', is_alpha: false },
-  { id: 'spawn-arceus-1', pokemon_id: 'arceus', location_id: 'coronet-highlands', area_ar: 'قمة كورونيت', area_en: 'Coronet Peak', conditions_ar: 'بعد إكمال كل شيء', conditions_en: 'After completing everything', rarity: 'very_rare', is_alpha: false },
-];
+// Use comprehensive spawns data from hisui-spawns.ts
+export const seedSpawns: Spawn[] = hisuiSpawns;
 
 // Use comprehensive moves data from hisui-moves.ts
 export const seedMoves: Move[] = hisuiMoves;
