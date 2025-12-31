@@ -40,6 +40,7 @@ import TypeChartPage from "./pages/TypeChart";
 import FavoritesPage from "./pages/Favorites";
 import TrackerPage from "./pages/Tracker";
 import { OfflineIndicator } from "./components/OfflineIndicator";
+import { AIChatButton } from "./components/AIChatButton";
 
 const queryClient = new QueryClient();
 
@@ -123,6 +124,7 @@ const App = () => {
                 </Routes>
               </main>
               <Navigation />
+              <AIChatButton />
             </div>
           </BrowserRouter>
         </TooltipProvider>

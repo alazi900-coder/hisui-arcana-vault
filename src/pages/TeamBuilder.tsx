@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { 
   Users, Plus, X, Shield, Swords, Search, 
-  ChevronDown, Sparkles, AlertTriangle, CheckCircle2 
+  ChevronDown, Sparkles, AlertTriangle, CheckCircle2,
+  Bot, Loader2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Pokemon, PokemonType } from '@/types/pokemon';
@@ -21,6 +22,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useToast } from '@/hooks/use-toast';
 
 interface TeamSlot {
   pokemon: Pokemon | null;
@@ -49,12 +51,15 @@ const TYPE_COLORS: Record<string, string> = {
 
 export default function TeamBuilderPage() {
   const { t, lang } = useLanguage();
+  const { toast } = useToast();
   const [team, setTeam] = useState<TeamSlot[]>(
     Array(6).fill(null).map(() => ({ pokemon: null }))
   );
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const allPokemon = useLiveQuery(() => db.pokemon.orderBy('dex_no').toArray());
 
@@ -128,6 +133,55 @@ export default function TeamBuilderPage() {
   };
 
   const analysis = getTeamAnalysis();
+
+  const getAIAnalysis = async () => {
+    if (teamPokemon.length < 2) {
+      toast({
+        title: t('تحتاج بوكيمونين على الأقل', 'Need at least 2 Pokémon'),
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsAnalyzing(true);
+    setAiAnalysis(null);
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/team-analysis`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({
+            team: teamPokemon.map(p => ({
+              name: p.name_en,
+              types: p.types,
+            })),
+            language: lang,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to analyze team');
+      }
+
+      const data = await response.json();
+      setAiAnalysis(data.analysis);
+    } catch (error) {
+      console.error('AI Analysis error:', error);
+      toast({
+        title: t('فشل التحليل', 'Analysis failed'),
+        description: t('حاول مرة أخرى لاحقاً', 'Please try again later'),
+        variant: 'destructive',
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
 
   return (
     <div className="pb-20 pt-4 min-h-screen">
@@ -347,6 +401,41 @@ export default function TeamBuilderPage() {
                 </div>
               </div>
             </div>
+
+            {/* AI Analysis Button */}
+            <Button 
+              onClick={getAIAnalysis} 
+              disabled={isAnalyzing || teamPokemon.length < 2}
+              className="w-full gap-2"
+              variant="outline"
+            >
+              {isAnalyzing ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  {t('جاري التحليل...', 'Analyzing...')}
+                </>
+              ) : (
+                <>
+                  <Bot className="w-4 h-4" />
+                  {t('تحليل AI للفريق', 'AI Team Analysis')}
+                </>
+              )}
+            </Button>
+
+            {/* AI Analysis Result */}
+            {aiAnalysis && (
+              <div className="glass rounded-xl p-4 border-l-4 border-l-primary">
+                <div className="flex items-center gap-2 mb-3">
+                  <Bot className="w-4 h-4 text-primary" />
+                  <span className="font-medium">
+                    {t('تحليل الذكاء الاصطناعي', 'AI Analysis')}
+                  </span>
+                </div>
+                <div className="text-sm text-muted-foreground whitespace-pre-wrap">
+                  {aiAnalysis}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
