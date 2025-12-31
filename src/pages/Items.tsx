@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { 
   Search, Filter, ChevronDown, LayoutGrid, List, 
   Circle, Heart, Cherry, Sparkles, Hammer, Key, Package,
-  SortAsc, SortDesc, Sparkle
+  SortAsc, SortDesc, Sparkle, FlaskConical
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
@@ -185,9 +185,18 @@ export default function ItemsPage() {
           </div>
           
           <div className="relative z-10">
-            <h1 className="text-3xl font-bold text-gradient mb-2">
-              {t('العناصر', 'Items')}
-            </h1>
+            <div className="flex items-center justify-between mb-2">
+              <h1 className="text-3xl font-bold text-gradient">
+                {t('العناصر', 'Items')}
+              </h1>
+              <Link 
+                to="/recipes"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-accent/20 text-accent border border-accent/30 text-sm font-medium hover:bg-accent/30 transition-colors"
+              >
+                <FlaskConical className="w-4 h-4" />
+                {t('الوصفات', 'Recipes')}
+              </Link>
+            </div>
             <p className="text-muted-foreground text-sm mb-4">
               {t('استكشف جميع العناصر في Pokémon Legends: Arceus', 'Explore all items in Pokémon Legends: Arceus')}
             </p>
