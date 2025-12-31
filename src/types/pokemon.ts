@@ -45,6 +45,7 @@ export interface Pokemon {
   images: {
     thumb: string;
     artwork: string;
+    animated?: string;
   };
   learnset: LearnsetEntry[];
   spawn_refs: string[];
