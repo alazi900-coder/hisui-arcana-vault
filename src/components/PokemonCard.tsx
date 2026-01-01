@@ -2,12 +2,12 @@ import { forwardRef, useState } from 'react';
 import { Pokemon } from '@/types/pokemon';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { Star } from 'lucide-react';
+import { Star, CheckCircle2, Sparkles } from 'lucide-react';
 import { toggleFavorite, isFavorite } from '@/lib/db';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '@/lib/db';
 import { Link } from 'react-router-dom';
 import { getAnimatedSpriteUrl, getPokeApiArtwork, getPokemonComAsset } from '@/lib/pokemon-images';
+import { useLivingDexEntry } from '@/hooks/use-living-dex';
 
 const typeColors: Record<string, string> = {
   normal: 'from-type-normal/30 to-type-normal/10',
@@ -42,6 +42,7 @@ export const PokemonCard = forwardRef<HTMLAnchorElement, PokemonCardProps>(
     const [imgFallbackIndex, setImgFallbackIndex] = useState(0);
     
     const favorite = useLiveQuery(() => isFavorite('pokemon', pokemon.id), [pokemon.id]);
+    const livingDexEntry = useLivingDexEntry(pokemon.id);
     
     const isLegendary = pokemon.tags.includes('legendary') || pokemon.tags.includes('mythical');
     const isAlpha = pokemon.tags.includes('alpha');
@@ -79,6 +80,11 @@ export const PokemonCard = forwardRef<HTMLAnchorElement, PokemonCardProps>(
       setTimeout(() => setAnimateFav(false), 400);
     };
 
+    // Living Dex status
+    const isCaught = livingDexEntry?.caught ?? false;
+    const hasAlpha = livingDexEntry?.alpha ?? false;
+    const hasShiny = livingDexEntry?.shiny ?? false;
+
     return (
       <Link to={`/pokemon/${pokemon.id}`} ref={ref}>
       <div className={cn(
@@ -86,6 +92,7 @@ export const PokemonCard = forwardRef<HTMLAnchorElement, PokemonCardProps>(
         gradient,
         isLegendary && 'border-gold/50',
         isAlpha && 'border-destructive/50',
+        isCaught && 'ring-2 ring-emerald-500/30',
       )}>
         {/* Favorite button */}
         <button 
@@ -100,6 +107,27 @@ export const PokemonCard = forwardRef<HTMLAnchorElement, PokemonCardProps>(
             )} 
           />
         </button>
+        
+        {/* Living Dex Status Icons */}
+        {(isCaught || hasAlpha || hasShiny) && (
+          <div className="absolute bottom-2 end-2 flex gap-1 z-10">
+            {isCaught && (
+              <div className="p-1 rounded-full bg-emerald-500/20 backdrop-blur-sm" title={t('تم الإمساك', 'Caught')}>
+                <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+              </div>
+            )}
+            {hasAlpha && (
+              <div className="p-1 rounded-full bg-red-500/20 backdrop-blur-sm" title={t('ألفا', 'Alpha')}>
+                <Star className="w-3 h-3 text-red-400 fill-red-400" />
+              </div>
+            )}
+            {hasShiny && (
+              <div className="p-1 rounded-full bg-yellow-500/20 backdrop-blur-sm" title={t('لامع', 'Shiny')}>
+                <Sparkles className="w-3 h-3 text-yellow-400" />
+              </div>
+            )}
+          </div>
+        )}
         
         {/* Tags */}
         <div className="absolute top-2 start-2 flex gap-1">

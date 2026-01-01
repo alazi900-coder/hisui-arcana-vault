@@ -1,7 +1,7 @@
 import Dexie, { Table } from 'dexie';
 import type { 
   Pokemon, Move, Item, Recipe, Location, Spawn, Request,
-  AppSettings, FavoriteItem, RecentItem 
+  AppSettings, FavoriteItem, RecentItem, LivingDexEntry 
 } from '@/types/pokemon';
 
 export class PLADexDatabase extends Dexie {
@@ -16,6 +16,7 @@ export class PLADexDatabase extends Dexie {
   favorites!: Table<FavoriteItem, [string, string]>;
   recents!: Table<RecentItem, string>;
   metadata!: Table<{ key: string; value: string }, string>;
+  livingDex!: Table<LivingDexEntry, string>;
 
   constructor() {
     super('PLADexX');
@@ -32,6 +33,22 @@ export class PLADexDatabase extends Dexie {
       favorites: '[type+id], type, addedAt',
       recents: 'id, type, viewedAt',
       metadata: 'key',
+    });
+    
+    // Add Living Dex table in version 2
+    this.version(2).stores({
+      pokemon: 'id, dex_no, name_ar, name_en, *types, *tags',
+      moves: 'id, name_ar, name_en, type, category',
+      items: 'id, name_ar, name_en, type',
+      recipes: 'id, name_ar, name_en',
+      locations: 'id, name_ar, name_en, region',
+      spawns: 'id, pokemon_id, location_id, rarity, is_alpha',
+      requests: 'id, title_ar, title_en, location_id',
+      settings: '++id',
+      favorites: '[type+id], type, addedAt',
+      recents: 'id, type, viewedAt',
+      metadata: 'key',
+      livingDex: 'pokemon_id, caught, alpha, shiny, updated_at',
     });
   }
 }

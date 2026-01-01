@@ -160,3 +160,13 @@ export interface RecentItem {
   id: string;
   viewedAt: number;
 }
+
+// Living Dex tracking
+export interface LivingDexEntry {
+  pokemon_id: string;
+  caught: boolean;
+  alpha: boolean;
+  shiny: boolean;
+  notes: string;
+  updated_at: number;
+}
