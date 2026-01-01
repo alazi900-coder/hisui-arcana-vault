@@ -8,11 +8,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
   ArrowLeft, ArrowRight, Star, Share2, ChevronRight, ChevronDown,
-  MapPin, Swords, Info, BarChart3, GitBranch, Search, Shield, Zap, Sparkles
+  MapPin, Swords, Info, BarChart3, GitBranch, Search, Shield, Zap, Sparkles, ClipboardCheck
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getWeaknesses, getResistances, getImmunities } from '@/lib/type-chart';
 import { getReliableImageSources } from '@/lib/pokemon-images';
+import { LivingDexProgress } from '@/components/LivingDexProgress';
 import type { Pokemon, Spawn, Location, Move, LearnsetEntry, PokemonType } from '@/types/pokemon';
 
 // Type gradient backgrounds
@@ -1063,10 +1064,14 @@ export default function PokemonDetails() {
       {/* Tabs */}
       <div className="container px-4 relative z-10">
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-6 bg-secondary/50 backdrop-blur-sm p-1 rounded-xl">
+          <TabsList className="grid w-full grid-cols-6 mb-6 bg-secondary/50 backdrop-blur-sm p-1 rounded-xl">
             <TabsTrigger value="overview" className="gap-1 text-xs rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Info className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">{t('عام', 'Info')}</span>
+            </TabsTrigger>
+            <TabsTrigger value="progress" className="gap-1 text-xs rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <ClipboardCheck className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">{t('تقدم', 'Track')}</span>
             </TabsTrigger>
             <TabsTrigger value="stats" className="gap-1 text-xs rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <BarChart3 className="w-3.5 h-3.5" />
@@ -1116,6 +1121,14 @@ export default function PokemonDetails() {
               <h3 className="font-bold mb-3 text-lg">{t('فعالية الأنواع', 'Type Effectiveness')}</h3>
               <TypeEffectivenessSection types={pokemon.types} />
             </div>
+          </TabsContent>
+
+          {/* Progress Tab - Living Dex */}
+          <TabsContent value="progress" className="space-y-4">
+            <LivingDexProgress 
+              pokemonId={pokemon.id} 
+              pokemonName={t(pokemon.name_ar, pokemon.name_en)} 
+            />
           </TabsContent>
 
           {/* Stats Tab */}
