@@ -60,11 +60,13 @@ export function PokemonImage({
   if (hasError) {
     return (
       <div className={cn(
-        'flex items-center justify-center bg-secondary/50 rounded-full',
+        'flex items-center justify-center bg-secondary/50 rounded-full border border-border/30',
         sizeClasses[size],
         className
       )}>
-        <span className="text-4xl">❓</span>
+        <div className="text-center">
+          <span className="text-3xl opacity-50">🔮</span>
+        </div>
       </div>
     );
   }
@@ -123,8 +125,8 @@ export function PokemonImageWithFallback({
   
   if (hasError) {
     return (
-      <div className={cn('flex items-center justify-center bg-secondary/50 rounded-full', className)}>
-        <span className="text-2xl">❓</span>
+      <div className={cn('flex items-center justify-center bg-secondary/50 rounded-full border border-border/30', className)}>
+        <span className="text-lg opacity-50">🔮</span>
       </div>
     );
   }

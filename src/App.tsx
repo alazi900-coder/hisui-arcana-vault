@@ -40,6 +40,7 @@ import TypeChartPage from "./pages/TypeChart";
 import FavoritesPage from "./pages/Favorites";
 import TrackerPage from "./pages/Tracker";
 import { OfflineIndicator } from "./components/OfflineIndicator";
+import { UpdateAvailableBanner } from "./components/UpdateAvailableBanner";
 import { AIChatButton } from "./components/AIChatButton";
 
 const queryClient = new QueryClient();
@@ -124,6 +125,7 @@ const App = () => {
                 </Routes>
               </main>
               <Navigation />
+              <UpdateAvailableBanner />
               <AIChatButton />
             </div>
           </BrowserRouter>
