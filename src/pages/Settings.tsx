@@ -1,13 +1,25 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Settings as SettingsIcon, Globe, Minimize2, Lock, Database, Trash2, Download, Upload } from 'lucide-react';
+import { Settings as SettingsIcon, Globe, Minimize2, Lock, Database, Trash2, Download, Upload, HardDrive, Image, AlertCircle } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { clearAllData } from '@/lib/db';
-import { loadSeedData, reloadAllData } from '@/lib/seed-data';
-import { cn } from '@/lib/utils';
+import { reloadAllData } from '@/lib/seed-data';
+import { OfflineDownloadManager } from '@/components/OfflineDownloadManager';
+import { getImageCacheStats, clearImageCache, formatBytes, getLastDownloadTime } from '@/hooks/use-offline-download';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 export default function SettingsPage() {
   const { lang, setLang, t } = useLanguage();
@@ -15,6 +27,14 @@ export default function SettingsPage() {
   const [pinEnabled, setPinEnabled] = useState(false);
   const [pin, setPin] = useState('');
   const [showPinInput, setShowPinInput] = useState(false);
+  const [cacheStats, setCacheStats] = useState<{ count: number; sizeBytes: number } | null>(null);
+  const [lastDownload, setLastDownload] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Load cache stats
+    getImageCacheStats().then(setCacheStats);
+    setLastDownload(getLastDownloadTime());
+  }, []);
 
   const handleLanguageToggle = () => {
     setLang(lang === 'ar' ? 'en' : 'ar');
@@ -33,6 +53,13 @@ export default function SettingsPage() {
   const handleClearData = async () => {
     await clearAllData();
     toast.success(t('تم حذف كل البيانات', 'All data cleared'));
+  };
+
+  const handleClearImageCache = async () => {
+    await clearImageCache();
+    setCacheStats({ count: 0, sizeBytes: 0 });
+    setLastDownload(null);
+    toast.success(t('تم مسح ذاكرة الصور', 'Image cache cleared'));
   };
 
   const handlePinSave = () => {
@@ -66,6 +93,11 @@ export default function SettingsPage() {
     toast.success(t('تم التصدير', 'Data exported'));
   };
 
+  const handleDownloadComplete = () => {
+    getImageCacheStats().then(setCacheStats);
+    setLastDownload(getLastDownloadTime());
+  };
+
   return (
     <div className="pb-20 pt-20">
       <div className="p-4">
@@ -80,6 +112,67 @@ export default function SettingsPage() {
         </div>
 
         <div className="space-y-4">
+          {/* Offline Download Manager */}
+          <OfflineDownloadManager onComplete={handleDownloadComplete} />
+
+          {/* Offline Storage Info */}
+          <div className="glass rounded-xl p-4">
+            <div className="flex items-center gap-3 mb-4">
+              <HardDrive className="w-5 h-5 text-accent" />
+              <div className="font-medium">{t('التخزين المحلي', 'Offline Storage')}</div>
+            </div>
+            
+            <div className="space-y-3">
+              {/* Image cache stats */}
+              <div className="flex items-center justify-between p-3 bg-secondary/50 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <Image className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm">{t('ذاكرة الصور', 'Image Cache')}</span>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {cacheStats ? (
+                    <>
+                      {cacheStats.count} {t('صورة', 'images')} • {formatBytes(cacheStats.sizeBytes)}
+                    </>
+                  ) : (
+                    t('جاري التحميل...', 'Loading...')
+                  )}
+                </div>
+              </div>
+
+              {/* Clear cache button */}
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    className="w-full"
+                    disabled={!cacheStats || cacheStats.count === 0}
+                  >
+                    <Trash2 className="w-4 h-4 me-2" />
+                    {t('مسح ذاكرة الصور', 'Clear Image Cache')}
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>{t('مسح ذاكرة الصور؟', 'Clear Image Cache?')}</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {t(
+                        'سيتم حذف جميع الصور المحفوظة محلياً. ستحتاج لإعادة التحميل للعمل بدون اتصال.',
+                        'All locally saved images will be deleted. You will need to re-download for offline use.'
+                      )}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>{t('إلغاء', 'Cancel')}</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleClearImageCache}>
+                      {t('مسح', 'Clear')}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+          </div>
+
           {/* Language */}
           <div className="glass rounded-xl p-4">
             <div className="flex items-center justify-between">
@@ -185,14 +278,34 @@ export default function SettingsPage() {
                 <Upload className="w-4 h-4 me-2" />
                 {t('تصدير', 'Export')}
               </Button>
-              <Button 
-                variant="destructive" 
-                className="w-full col-span-2"
-                onClick={handleClearData}
-              >
-                <Trash2 className="w-4 h-4 me-2" />
-                {t('حذف كل البيانات', 'Clear All Data')}
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button 
+                    variant="destructive" 
+                    className="w-full col-span-2"
+                  >
+                    <Trash2 className="w-4 h-4 me-2" />
+                    {t('حذف كل البيانات', 'Clear All Data')}
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>{t('حذف كل البيانات؟', 'Clear All Data?')}</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {t(
+                        'سيتم حذف جميع البيانات بما في ذلك البوكيمون والحركات والعناصر. لا يمكن التراجع عن هذا الإجراء.',
+                        'All data including Pokémon, moves, and items will be deleted. This action cannot be undone.'
+                      )}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>{t('إلغاء', 'Cancel')}</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleClearData}>
+                      {t('حذف', 'Delete')}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </div>
 
@@ -202,7 +315,7 @@ export default function SettingsPage() {
             <div className="text-sm text-muted-foreground">
               {t('دليل بوكيمون أركيوس', 'Pokémon Legends: Arceus Guide')}
             </div>
-            <div className="text-xs text-muted-foreground mt-2">v1.0.0</div>
+            <div className="text-xs text-muted-foreground mt-2">v1.1.0</div>
           </div>
         </div>
       </div>

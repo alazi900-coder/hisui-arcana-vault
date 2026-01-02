@@ -40,15 +40,75 @@ export default defineConfig(({ mode }) => ({
         ]
       },
       workbox: {
-        globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
+        globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2,webp,jpg,jpeg,gif}"],
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB
         runtimeCaching: [
+          // Images (highest priority) - Cache First
+          {
+            urlPattern: /\.(?:png|jpg|jpeg|gif|svg|webp)$/i,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "img-cache-v1",
+              expiration: {
+                maxEntries: 3000,
+                maxAgeSeconds: 60 * 60 * 24 * 60 // 60 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          },
+          // PokeAPI and Pokemon image sources - Cache First
+          {
+            urlPattern: /^https:\/\/raw\.githubusercontent\.com\/PokeAPI\/.*/i,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "img-cache-v1",
+              expiration: {
+                maxEntries: 3000,
+                maxAgeSeconds: 60 * 60 * 24 * 60 // 60 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          },
+          {
+            urlPattern: /^https:\/\/play\.pokemonshowdown\.com\/sprites\/.*/i,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "img-cache-v1",
+              expiration: {
+                maxEntries: 3000,
+                maxAgeSeconds: 60 * 60 * 24 * 60 // 60 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          },
+          {
+            urlPattern: /^https:\/\/assets\.pokemon\.com\/.*/i,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "img-cache-v1",
+              expiration: {
+                maxEntries: 3000,
+                maxAgeSeconds: 60 * 60 * 24 * 60 // 60 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          },
+          // Google Fonts - Cache First
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: "CacheFirst",
             options: {
               cacheName: "google-fonts-cache",
               expiration: {
-                maxEntries: 10,
+                maxEntries: 20,
                 maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
               },
               cacheableResponse: {
@@ -62,11 +122,39 @@ export default defineConfig(({ mode }) => ({
             options: {
               cacheName: "gstatic-fonts-cache",
               expiration: {
-                maxEntries: 10,
+                maxEntries: 20,
                 maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
               },
               cacheableResponse: {
                 statuses: [0, 200]
+              }
+            }
+          },
+          // API/JSON requests - Network First with cache fallback
+          {
+            urlPattern: /\.json$/i,
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "api-cache-v1",
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24 * 7 // 7 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              },
+              networkTimeoutSeconds: 5
+            }
+          },
+          // Static assets - Stale While Revalidate
+          {
+            urlPattern: /\.(?:js|css|woff2?)$/i,
+            handler: "StaleWhileRevalidate",
+            options: {
+              cacheName: "static-cache-v1",
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
               }
             }
           }
