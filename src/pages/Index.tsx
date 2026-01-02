@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, getRecents } from '@/lib/db';
@@ -8,8 +8,12 @@ import { Link } from 'react-router-dom';
 import { 
   Grid3X3, Swords, Package, MapPin, ClipboardList, GitCompare, 
   Upload, Sparkles, Crown, Zap, FlaskConical, Clock, Search, Map,
-  Users, Calculator, Heart, Target
+  Users, Calculator, Heart, Target, WifiOff, Download, CheckCircle, Loader2
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { useOfflineDownload, getLastDownloadTime } from '@/hooks/use-offline-download';
+import { cn } from '@/lib/utils';
 
 const quickLinks = [
   { path: '/pokemon', icon: Grid3X3, labelAr: 'بوكيدكس', labelEn: 'Pokédex', color: 'bg-primary/20 text-primary' },
@@ -49,11 +53,22 @@ const typeColors: Record<string, string> = {
 
 export default function Index() {
   const { t } = useLanguage();
+  const { progress, isDownloading, startDownload } = useOfflineDownload();
+  const [lastDownload, setLastDownload] = useState<string | null>(null);
+  const [showDownloadCard, setShowDownloadCard] = useState(true);
 
   // Load seed data on first visit
   useEffect(() => {
     loadSeedData();
+    setLastDownload(getLastDownloadTime());
   }, []);
+
+  // Update last download time when complete
+  useEffect(() => {
+    if (progress.stage === 'complete') {
+      setLastDownload(getLastDownloadTime());
+    }
+  }, [progress.stage]);
 
   const pokemon = useLiveQuery(() => db.pokemon.toArray(), []);
   const recents = useLiveQuery(() => getRecents(6), []);
@@ -129,6 +144,70 @@ export default function Index() {
             </p>
           </div>
         </div>
+
+        {/* Offline Download Status Card */}
+        {showDownloadCard && !lastDownload && progress.stage === 'idle' && (
+          <div className="glass rounded-xl p-4 mb-6 border border-primary/30 animate-fade-in-up">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-primary/20">
+                  <WifiOff className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <div className="font-medium text-sm">{t('العمل بدون اتصال', 'Work Offline')}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {t('حمّل البيانات والصور', 'Download data & images')}
+                  </div>
+                </div>
+              </div>
+              <Button size="sm" onClick={startDownload}>
+                <Download className="w-4 h-4 me-1" />
+                {t('تحميل', 'Download')}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Download Progress */}
+        {(progress.stage === 'data' || progress.stage === 'images') && (
+          <div className="glass rounded-xl p-4 mb-6 border border-primary/30 animate-fade-in-up">
+            <div className="flex items-center gap-3 mb-3">
+              <Loader2 className="w-5 h-5 text-primary animate-spin" />
+              <div className="flex-1">
+                <div className="flex justify-between text-sm mb-1">
+                  <span>{progress.stage === 'data' ? t('البيانات', 'Data') : t('الصور', 'Images')}</span>
+                  <span>
+                    {progress.stage === 'images' 
+                      ? `${progress.imagesCurrent}/${progress.imagesTotal}`
+                      : `${progress.dataProgress}%`
+                    }
+                  </span>
+                </div>
+                <Progress 
+                  value={progress.stage === 'data' ? progress.dataProgress : progress.imagesProgress} 
+                  className="h-2" 
+                />
+              </div>
+            </div>
+            {progress.currentItem && (
+              <div className="text-xs text-muted-foreground text-center">
+                {progress.currentItem}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Download Complete */}
+        {progress.stage === 'complete' && (
+          <div className="glass rounded-xl p-3 mb-6 border border-type-grass/30 animate-fade-in-up">
+            <div className="flex items-center gap-2 text-type-grass">
+              <CheckCircle className="w-5 h-5" />
+              <span className="text-sm font-medium">
+                {t('تم التحميل! يمكنك العمل بدون اتصال', 'Downloaded! You can work offline')}
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* Quick Links */}
         <div className="grid grid-cols-3 gap-3 mb-6">
