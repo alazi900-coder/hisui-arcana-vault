@@ -8,12 +8,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
   ArrowLeft, ArrowRight, Star, Share2, ChevronRight, ChevronDown,
-  MapPin, Swords, Info, BarChart3, GitBranch, Search, Shield, Zap, Sparkles, ClipboardCheck
+  MapPin, Swords, Info, BarChart3, GitBranch, Search, Shield, Zap, Sparkles, ClipboardCheck, Target
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getWeaknesses, getResistances, getImmunities } from '@/lib/type-chart';
 import { getReliableImageSources } from '@/lib/pokemon-images';
 import { LivingDexProgress } from '@/components/LivingDexProgress';
+import { CatchHelper } from '@/components/CatchHelper';
 import type { Pokemon, Spawn, Location, Move, LearnsetEntry, PokemonType } from '@/types/pokemon';
 
 // Type gradient backgrounds
@@ -827,6 +828,7 @@ export default function PokemonDetails() {
   const { t, isRTL } = useLanguage();
   const [animateFav, setAnimateFav] = useState(false);
   const [typePressed, setTypePressed] = useState<string | null>(null);
+  const [catchHelperOpen, setCatchHelperOpen] = useState(false);
 
   const pokemon = useLiveQuery(() => 
     id ? db.pokemon.get(id) : undefined
@@ -919,6 +921,15 @@ export default function PokemonDetails() {
           </Link>
           
           <div className="flex gap-2">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => setCatchHelperOpen(true)} 
+              className="backdrop-blur-sm bg-primary/20 hover:bg-primary/30 text-primary"
+              title={t('مساعد الصيد', 'Catch Helper')}
+            >
+              <Target className="w-5 h-5" />
+            </Button>
             <Button variant="ghost" size="icon" onClick={handleShare} className="backdrop-blur-sm bg-secondary/50">
               <Share2 className="w-5 h-5" />
             </Button>
@@ -1199,6 +1210,16 @@ export default function PokemonDetails() {
           </TabsContent>
         </Tabs>
       </div>
+      
+      {/* Catch Helper Modal */}
+      {pokemon && (
+        <CatchHelper
+          pokemon={pokemon}
+          spawns={spawns || []}
+          isOpen={catchHelperOpen}
+          onClose={() => setCatchHelperOpen(false)}
+        />
+      )}
       
       {/* Custom Styles */}
       <style>{`
