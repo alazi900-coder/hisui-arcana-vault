@@ -6,6 +6,9 @@ import { db } from '@/lib/db';
 import type { Location, Spawn, Pokemon } from '@/types/pokemon';
 import { PokemonImage } from './PokemonImage';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Progress } from '@/components/ui/progress';
+import { useLivingDexMap } from '@/hooks/use-living-dex';
 import { 
   MapPin, 
   Star, 
@@ -14,7 +17,14 @@ import {
   Moon, 
   ChevronRight,
   Filter,
-  X
+  X,
+  Maximize2,
+  Minimize2,
+  Search,
+  Target,
+  TrendingUp,
+  CheckCircle2,
+  Circle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -90,11 +100,15 @@ export function HisuiMap({ className }: HisuiMapProps) {
     timeOfDay?: 'day' | 'night';
   }>({});
   const [showFilters, setShowFilters] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showSearch, setShowSearch] = useState(false);
 
   // Fetch data
   const locations = useLiveQuery(() => db.locations.toArray(), []);
   const spawns = useLiveQuery(() => db.spawns.toArray(), []);
   const pokemon = useLiveQuery(() => db.pokemon.toArray(), []);
+  const livingDexMap = useLivingDexMap();
 
   // Create pokemon lookup
   const pokemonMap = useMemo(() => {
@@ -127,6 +141,18 @@ export function HisuiMap({ className }: HisuiMapProps) {
       );
     }
 
+    // Search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(s => {
+        const poke = pokemonMap.get(s.pokemon_id);
+        if (!poke) return false;
+        return poke.name_en.toLowerCase().includes(query) || 
+               poke.name_ar.includes(query) ||
+               poke.dex_no.toString().includes(query);
+      });
+    }
+
     // Remove duplicates by pokemon_id
     const seen = new Set<string>();
     return filtered.filter(s => {
@@ -134,25 +160,189 @@ export function HisuiMap({ className }: HisuiMapProps) {
       seen.add(s.pokemon_id);
       return true;
     });
-  }, [selectedRegion, spawns, filter]);
+  }, [selectedRegion, spawns, filter, searchQuery, pokemonMap]);
 
-  // Get spawn counts per region
-  const spawnCounts = useMemo(() => {
-    if (!spawns) return {};
-    const counts: Record<string, number> = {};
+  // Get spawn counts and progress per region
+  const regionStats = useMemo(() => {
+    if (!spawns || !livingDexMap) return {} as Record<string, { total: number; caught: number; alpha: number }>;
+    
+    const stats: Record<string, { total: number; caught: number; alpha: number }> = {};
+    const seenPokemon: Record<string, Set<string>> = {};
+    
     spawns.forEach(s => {
-      counts[s.location_id] = (counts[s.location_id] || 0) + 1;
+      if (!stats[s.location_id]) {
+        stats[s.location_id] = { total: 0, caught: 0, alpha: 0 };
+        seenPokemon[s.location_id] = new Set();
+      }
+      
+      // Count unique pokemon per region
+      if (!seenPokemon[s.location_id].has(s.pokemon_id)) {
+        seenPokemon[s.location_id].add(s.pokemon_id);
+        stats[s.location_id].total++;
+        
+        const entry = livingDexMap.get(s.pokemon_id);
+        if (entry?.caught) {
+          stats[s.location_id].caught++;
+        }
+        if (entry?.alpha) {
+          stats[s.location_id].alpha++;
+        }
+      }
     });
-    return counts;
-  }, [spawns]);
+    
+    return stats;
+  }, [spawns, livingDexMap]);
+
+  // Search results across all regions
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim() || !spawns || !pokemon) return [];
+    
+    const query = searchQuery.toLowerCase();
+    const results: Array<{ spawn: Spawn; pokemon: Pokemon; location: Location }> = [];
+    
+    spawns.forEach(s => {
+      const poke = pokemonMap.get(s.pokemon_id);
+      const loc = locations?.find(l => l.id === s.location_id);
+      if (!poke || !loc) return;
+      
+      if (poke.name_en.toLowerCase().includes(query) || 
+          poke.name_ar.includes(query) ||
+          poke.dex_no.toString().includes(query)) {
+        // Avoid duplicates
+        if (!results.find(r => r.pokemon.id === poke.id && r.location.id === loc.id)) {
+          results.push({ spawn: s, pokemon: poke, location: loc });
+        }
+      }
+    });
+    
+    return results.slice(0, 12);
+  }, [searchQuery, spawns, pokemon, pokemonMap, locations]);
 
   // Get selected location details
   const selectedLocation = locations?.find(l => l.id === selectedRegion);
 
+  // Calculate overall stats
+  const overallStats = useMemo(() => {
+    if (!pokemon || !livingDexMap) return { total: 0, caught: 0, percentage: 0 };
+    
+    const total = pokemon.length;
+    const caught = Array.from(livingDexMap.values()).filter(e => e.caught).length;
+    
+    return {
+      total,
+      caught,
+      percentage: total > 0 ? Math.round((caught / total) * 100) : 0,
+    };
+  }, [pokemon, livingDexMap]);
+
   return (
-    <div className={cn("relative", className)}>
+    <div className={cn(
+      "relative transition-all duration-300",
+      isFullscreen && "fixed inset-0 z-50 bg-background p-4",
+      className
+    )}>
+      {/* Quick Stats Bar */}
+      <div className="flex items-center justify-between gap-2 mb-4 p-3 rounded-xl bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 border border-border/50">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Target className="w-4 h-4 text-primary" />
+            <span className="text-sm font-medium">{overallStats.caught}/{overallStats.total}</span>
+          </div>
+          <div className="hidden sm:flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-accent" />
+            <span className="text-sm">{overallStats.percentage}%</span>
+          </div>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          {/* Search Toggle */}
+          <button
+            onClick={() => setShowSearch(!showSearch)}
+            className={cn(
+              "p-2 rounded-lg transition-all",
+              showSearch ? "bg-primary text-primary-foreground" : "bg-secondary/80 hover:bg-secondary"
+            )}
+          >
+            <Search className="w-4 h-4" />
+          </button>
+          
+          {/* Fullscreen Toggle */}
+          <button
+            onClick={() => setIsFullscreen(!isFullscreen)}
+            className="p-2 rounded-lg bg-secondary/80 hover:bg-secondary transition-colors"
+          >
+            {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+          </button>
+        </div>
+      </div>
+
+      {/* Search Bar */}
+      {showSearch && (
+        <div className="mb-4 animate-fade-in-up">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={t('ابحث عن بوكيمون...', 'Search Pokémon...')}
+              className="pl-10 bg-secondary/50"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2"
+              >
+                <X className="w-4 h-4 text-muted-foreground hover:text-foreground" />
+              </button>
+            )}
+          </div>
+          
+          {/* Search Results */}
+          {searchResults.length > 0 && (
+            <div className="mt-2 p-3 rounded-xl bg-secondary/50 border border-border/50">
+              <h4 className="text-xs text-muted-foreground mb-2">
+                {t('نتائج البحث', 'Search Results')} ({searchResults.length})
+              </h4>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                {searchResults.map(({ spawn, pokemon: poke, location }) => (
+                  <button
+                    key={`${spawn.id}-${location.id}`}
+                    onClick={() => {
+                      setSelectedRegion(location.id);
+                      setShowSearch(false);
+                    }}
+                    className="flex items-center gap-2 p-2 rounded-lg bg-background/50 hover:bg-background transition-colors text-left"
+                  >
+                    <PokemonImage
+                      pokemonId={poke.id}
+                      dexNo={poke.dex_no}
+                      name={isRTL ? poke.name_ar : poke.name_en}
+                      currentImages={poke.images}
+                      size="sm"
+                      className="w-8 h-8"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs font-medium truncate">
+                        {isRTL ? poke.name_ar : poke.name_en}
+                      </div>
+                      <div className="text-[10px] text-muted-foreground flex items-center gap-1">
+                        <MapPin className="w-3 h-3" />
+                        {REGION_CONFIG[location.id]?.icon}
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Interactive Map */}
-      <div className="relative w-full aspect-[4/3] bg-gradient-to-b from-background via-card to-background rounded-2xl overflow-hidden border border-border/50">
+      <div className={cn(
+        "relative w-full bg-gradient-to-b from-background via-card to-background rounded-2xl overflow-hidden border border-border/50",
+        isFullscreen ? "aspect-auto flex-1" : "aspect-[4/3]"
+      )}>
         {/* Background decorations */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_hsl(185_100%_50%_/_0.05)_0%,_transparent_70%)]" />
         <div className="absolute top-4 left-4 text-xs text-muted-foreground flex items-center gap-2">
@@ -171,7 +361,8 @@ export function HisuiMap({ className }: HisuiMapProps) {
           if (!config) return null;
 
           const isSelected = selectedRegion === location.id;
-          const spawnCount = spawnCounts[location.id] || 0;
+          const stats = (regionStats[location.id] as { total: number; caught: number; alpha: number }) || { total: 0, caught: 0, alpha: 0 };
+          const progress = stats.total > 0 ? Math.round((stats.caught / stats.total) * 100) : 0;
 
           return (
             <button
@@ -197,6 +388,34 @@ export function HisuiMap({ className }: HisuiMapProps) {
                   ? "border-primary shadow-lg shadow-primary/20 glow-cyan" 
                   : "border-border/50 hover:border-primary/50"
               )}>
+                {/* Progress ring */}
+                <div className="absolute -top-1 -right-1 w-6 h-6">
+                  <svg className="w-6 h-6 -rotate-90">
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      className="text-background/30"
+                    />
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeDasharray={`${progress * 0.628} 62.8`}
+                      className="text-primary"
+                    />
+                  </svg>
+                  <span className="absolute inset-0 flex items-center justify-center text-[8px] font-bold">
+                    {progress}%
+                  </span>
+                </div>
+
                 {/* Icon */}
                 <div className="text-2xl mb-1">{config.icon}</div>
                 
@@ -205,11 +424,15 @@ export function HisuiMap({ className }: HisuiMapProps) {
                   {isRTL ? location.name_ar : location.name_en}
                 </div>
                 
-                {/* Spawn count badge */}
+                {/* Stats badges */}
                 <div className="flex items-center justify-center gap-1 mt-1">
-                  <Badge variant="outline" className="text-xs bg-background/50">
-                    <Star className="w-3 h-3 mr-1" />
-                    {spawnCount}
+                  <Badge variant="outline" className="text-xs bg-background/50 gap-1">
+                    <CheckCircle2 className="w-3 h-3 text-green-500" />
+                    {stats.caught}
+                  </Badge>
+                  <Badge variant="outline" className="text-xs bg-background/50 gap-1">
+                    <Circle className="w-3 h-3 text-muted-foreground" />
+                    {stats.total}
                   </Badge>
                 </div>
 
@@ -269,7 +492,7 @@ export function HisuiMap({ className }: HisuiMapProps) {
                 <div className="text-3xl">
                   {REGION_CONFIG[selectedLocation.id]?.icon}
                 </div>
-                <div>
+                <div className="flex-1">
                   <h3 className="text-lg font-bold">
                     {isRTL ? selectedLocation.name_ar : selectedLocation.name_en}
                   </h3>
@@ -295,6 +518,23 @@ export function HisuiMap({ className }: HisuiMapProps) {
                   <X className="w-4 h-4" />
                 </button>
               </div>
+            </div>
+
+            {/* Region Progress */}
+            <div className="mb-4 p-3 rounded-xl bg-secondary/30">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium">{t('تقدم المنطقة', 'Region Progress')}</span>
+                <span className="text-sm text-primary font-bold">
+                  {regionStats[selectedLocation.id]?.caught || 0}/{regionStats[selectedLocation.id]?.total || 0}
+                </span>
+              </div>
+              <Progress 
+                value={regionStats[selectedLocation.id]?.total > 0 
+                  ? (regionStats[selectedLocation.id]?.caught / regionStats[selectedLocation.id]?.total) * 100 
+                  : 0
+                } 
+                className="h-2"
+              />
             </div>
 
             {/* Filters */}
@@ -428,6 +668,9 @@ export function HisuiMap({ className }: HisuiMapProps) {
                   const poke = pokemonMap.get(spawn.pokemon_id);
                   if (!poke) return null;
 
+                  const entry = livingDexMap?.get(poke.id);
+                  const isCaught = entry?.caught;
+
                   return (
                     <Link
                       key={spawn.id}
@@ -435,9 +678,17 @@ export function HisuiMap({ className }: HisuiMapProps) {
                       className={cn(
                         "group relative flex flex-col items-center p-2 rounded-xl transition-all",
                         "bg-secondary/50 hover:bg-secondary hover:scale-105",
-                        spawn.is_alpha && "ring-1 ring-red-500/50"
+                        spawn.is_alpha && "ring-1 ring-red-500/50",
+                        isCaught && "ring-1 ring-green-500/50"
                       )}
                     >
+                      {/* Caught indicator */}
+                      {isCaught && (
+                        <div className="absolute -top-1 -left-1 w-4 h-4 rounded-full bg-green-500 flex items-center justify-center">
+                          <CheckCircle2 className="w-2.5 h-2.5 text-foreground" />
+                        </div>
+                      )}
+
                       {/* Alpha badge */}
                       {spawn.is_alpha && (
                         <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 flex items-center justify-center">
@@ -452,7 +703,7 @@ export function HisuiMap({ className }: HisuiMapProps) {
                         name={isRTL ? poke.name_ar : poke.name_en}
                         currentImages={poke.images}
                         size="sm"
-                        className="w-12 h-12"
+                        className={cn("w-12 h-12", !isCaught && "opacity-60")}
                       />
 
                       {/* Name */}
