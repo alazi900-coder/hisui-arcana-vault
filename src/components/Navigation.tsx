@@ -2,14 +2,13 @@ import { forwardRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { Home, Grid3X3, Swords, Package, MapPin, ClipboardCheck, Settings } from 'lucide-react';
+import { Home, Grid3X3, Map, Target, Settings } from 'lucide-react';
 
 const navItems = [
   { path: '/', icon: Home, labelAr: 'الرئيسية', labelEn: 'Home' },
   { path: '/pokemon', icon: Grid3X3, labelAr: 'بوكيمون', labelEn: 'Pokémon' },
-  { path: '/tracker', icon: ClipboardCheck, labelAr: 'المتتبع', labelEn: 'Tracker' },
-  { path: '/items', icon: Package, labelAr: 'عناصر', labelEn: 'Items' },
-  { path: '/moves', icon: Swords, labelAr: 'حركات', labelEn: 'Moves' },
+  { path: '/map', icon: Map, labelAr: 'الخريطة', labelEn: 'Map' },
+  { path: '/tracker', icon: Target, labelAr: 'المتتبع', labelEn: 'Tracker' },
   { path: '/settings', icon: Settings, labelAr: 'إعدادات', labelEn: 'Settings' },
 ];
 

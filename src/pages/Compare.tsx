@@ -3,7 +3,10 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { cn } from '@/lib/utils';
-import { GitCompare, ChevronDown } from 'lucide-react';
+import { GitCompare, ChevronDown, Sparkles, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import type { Pokemon } from '@/types/pokemon';
 
 const statLabels = {
@@ -25,11 +28,13 @@ const statColors = {
 };
 
 export default function ComparePage() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [pokemon1Id, setPokemon1Id] = useState<string | null>(null);
   const [pokemon2Id, setPokemon2Id] = useState<string | null>(null);
   const [showDropdown1, setShowDropdown1] = useState(false);
   const [showDropdown2, setShowDropdown2] = useState(false);
+  const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const allPokemon = useLiveQuery(() => db.pokemon.toArray(), []);
   const pokemon1 = useLiveQuery(() => pokemon1Id ? db.pokemon.get(pokemon1Id) : undefined, [pokemon1Id]);
@@ -38,6 +43,46 @@ export default function ComparePage() {
   const getBST = (pokemon: Pokemon) => 
     pokemon.stats.hp + pokemon.stats.atk + pokemon.stats.def + 
     pokemon.stats.spa + pokemon.stats.spd + pokemon.stats.spe;
+
+  const handleAIAnalysis = async () => {
+    if (!pokemon1 || !pokemon2) return;
+    
+    setIsAnalyzing(true);
+    setAiAnalysis(null);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('battle-compare', {
+        body: { 
+          pokemon1: {
+            id: pokemon1.id,
+            name_en: pokemon1.name_en,
+            name_ar: pokemon1.name_ar,
+            types: pokemon1.types,
+            stats: pokemon1.stats,
+          },
+          pokemon2: {
+            id: pokemon2.id,
+            name_en: pokemon2.name_en,
+            name_ar: pokemon2.name_ar,
+            types: pokemon2.types,
+            stats: pokemon2.stats,
+          },
+          language: lang,
+        },
+      });
+
+      if (error) throw error;
+      setAiAnalysis(data.analysis);
+    } catch (error: unknown) {
+      console.error('Error getting AI analysis:', error);
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      toast.error(t('فشل التحليل', 'Analysis failed'), {
+        description: message,
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
 
   const renderPokemonSelector = (
     selected: Pokemon | undefined,
@@ -77,6 +122,7 @@ export default function ComparePage() {
               onClick={() => {
                 setId(p.id);
                 setShowDropdown(false);
+                setAiAnalysis(null);
               }}
               className="w-full flex items-center gap-3 p-3 hover:bg-secondary/50 transition-colors"
             >
@@ -92,7 +138,6 @@ export default function ComparePage() {
   const renderStatComparison = (statKey: keyof typeof statLabels) => {
     const val1 = pokemon1?.stats[statKey] || 0;
     const val2 = pokemon2?.stats[statKey] || 0;
-    const max = Math.max(val1, val2, 1);
     
     return (
       <div key={statKey} className="mb-3">
@@ -232,7 +277,7 @@ export default function ComparePage() {
             </div>
 
             {/* BST Comparison */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4 mb-4">
               <div className={cn(
                 'glass rounded-xl p-4 text-center',
                 getBST(pokemon1) > getBST(pokemon2) && 'border border-gold/50'
@@ -258,6 +303,39 @@ export default function ComparePage() {
                 </div>
               </div>
             </div>
+
+            {/* AI Analysis Button */}
+            <Button 
+              onClick={handleAIAnalysis} 
+              disabled={isAnalyzing}
+              className="w-full mb-4 gap-2"
+              variant="outline"
+            >
+              {isAnalyzing ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  {t('جاري التحليل...', 'Analyzing...')}
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4" />
+                  {t('تحليل AI للمعركة', 'AI Battle Analysis')}
+                </>
+              )}
+            </Button>
+
+            {/* AI Analysis Result */}
+            {aiAnalysis && (
+              <div className="glass rounded-xl p-4 animate-fade-in-up">
+                <div className="flex items-center gap-2 mb-3">
+                  <Sparkles className="w-5 h-5 text-primary" />
+                  <h3 className="font-semibold">{t('تحليل AI', 'AI Analysis')}</h3>
+                </div>
+                <div className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
+                  {aiAnalysis}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
