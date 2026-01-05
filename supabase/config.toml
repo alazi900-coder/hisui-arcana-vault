@@ -8,3 +8,9 @@ verify_jwt = false
 
 [functions.catch-helper]
 verify_jwt = false
+
+[functions.battle-compare]
+verify_jwt = false
+
+[functions.move-advisor]
+verify_jwt = false
