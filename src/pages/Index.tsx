@@ -33,6 +33,7 @@ const toolsLinks = [
   { path: '/type-chart', icon: Grid3X3, labelAr: 'مخطط الأنواع', labelEn: 'Type Chart', color: 'bg-accent/20 text-accent' },
   { path: '/favorites', icon: Heart, labelAr: 'المفضلة', labelEn: 'Favorites', color: 'bg-type-fire/20 text-type-fire' },
   { path: '/tracker', icon: Target, labelAr: 'المتتبع', labelEn: 'Tracker', color: 'bg-gold/20 text-gold' },
+  { path: '/save-import', icon: Upload, labelAr: 'استيراد', labelEn: 'Import', color: 'bg-type-grass/20 text-type-grass' },
 ];
 
 const typeIcons: Record<string, React.ElementType> = {
@@ -236,7 +237,7 @@ export default function Index() {
               {t('الأدوات', 'Tools')}
             </h2>
           </div>
-          <div className="grid grid-cols-5 gap-2">
+          <div className="grid grid-cols-6 gap-2">
             {toolsLinks.map((link, i) => (
               <Link 
                 key={link.path} 
@@ -349,21 +350,38 @@ export default function Index() {
         )}
 
         {/* Import Data Link */}
-        <Link to="/data-import">
-          <div className="glass rounded-xl p-4 flex items-center gap-3 card-hover">
-            <div className="p-2 rounded-lg bg-primary/20">
-              <Upload className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <div className="font-medium text-foreground">
-                {t('استيراد البيانات', 'Import Data')}
+        <div className="grid grid-cols-2 gap-3">
+          <Link to="/save-import">
+            <div className="glass rounded-xl p-4 flex items-center gap-3 card-hover h-full">
+              <div className="p-2 rounded-lg bg-type-grass/20">
+                <Upload className="w-5 h-5 text-type-grass" />
               </div>
-              <div className="text-sm text-muted-foreground">
-                {t('استورد Data Pack كامل', 'Import a full Data Pack')}
+              <div>
+                <div className="font-medium text-foreground text-sm">
+                  {t('استيراد Save', 'Import Save')}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {t('من PKHeX', 'From PKHeX')}
+                </div>
               </div>
             </div>
-          </div>
-        </Link>
+          </Link>
+          <Link to="/data-import">
+            <div className="glass rounded-xl p-4 flex items-center gap-3 card-hover h-full">
+              <div className="p-2 rounded-lg bg-primary/20">
+                <Upload className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <div className="font-medium text-foreground text-sm">
+                  {t('Data Pack', 'Data Pack')}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {t('استورد بيانات كاملة', 'Import full data')}
+                </div>
+              </div>
+            </div>
+          </Link>
+        </div>
       </div>
     </div>
   );

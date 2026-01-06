@@ -41,6 +41,8 @@ const DamageCalculatorPage = lazy(() => import("./pages/DamageCalculator"));
 const TypeChartPage = lazy(() => import("./pages/TypeChart"));
 const FavoritesPage = lazy(() => import("./pages/Favorites"));
 const TrackerPage = lazy(() => import("./pages/Tracker"));
+const SaveImportPage = lazy(() => import("./pages/SaveImport"));
+const InventoryPage = lazy(() => import("./pages/Inventory"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 import { OfflineIndicator } from "./components/OfflineIndicator";
@@ -111,6 +113,8 @@ function AppContent() {
               <Route path="/type-chart" element={<TypeChartPage />} />
               <Route path="/favorites" element={<FavoritesPage />} />
               <Route path="/tracker" element={<TrackerPage />} />
+              <Route path="/save-import" element={<SaveImportPage />} />
+              <Route path="/inventory" element={<InventoryPage />} />
               {/* Settings */}
               <Route path="/settings" element={<SettingsPage />} />
               {/* 404 */}

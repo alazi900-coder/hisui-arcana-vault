@@ -3,6 +3,7 @@ import type {
   Pokemon, Move, Item, Recipe, Location, Spawn, Request,
   AppSettings, FavoriteItem, RecentItem, LivingDexEntry 
 } from '@/types/pokemon';
+import type { InventoryEntry } from '@/types/save-data';
 
 export class PLADexDatabase extends Dexie {
   pokemon!: Table<Pokemon, string>;
@@ -17,6 +18,7 @@ export class PLADexDatabase extends Dexie {
   recents!: Table<RecentItem, string>;
   metadata!: Table<{ key: string; value: string }, string>;
   livingDex!: Table<LivingDexEntry, string>;
+  inventory!: Table<InventoryEntry, string>;
 
   constructor() {
     super('PLADexX');
@@ -49,6 +51,23 @@ export class PLADexDatabase extends Dexie {
       recents: 'id, type, viewedAt',
       metadata: 'key',
       livingDex: 'pokemon_id, caught, alpha, shiny, updated_at',
+    });
+    
+    // Add Inventory table in version 3
+    this.version(3).stores({
+      pokemon: 'id, dex_no, name_ar, name_en, *types, *tags',
+      moves: 'id, name_ar, name_en, type, category',
+      items: 'id, name_ar, name_en, type',
+      recipes: 'id, name_ar, name_en',
+      locations: 'id, name_ar, name_en, region',
+      spawns: 'id, pokemon_id, location_id, rarity, is_alpha',
+      requests: 'id, title_ar, title_en, location_id',
+      settings: '++id',
+      favorites: '[type+id], type, addedAt',
+      recents: 'id, type, viewedAt',
+      metadata: 'key',
+      livingDex: 'pokemon_id, caught, alpha, shiny, updated_at',
+      inventory: 'item_id, quantity, updated_at',
     });
   }
 }
