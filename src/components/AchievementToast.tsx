@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { Trophy, Star, Sparkles, Crown, Medal, Zap, Flame } from 'lucide-react';
@@ -19,9 +20,49 @@ interface AchievementToastProps {
   className?: string;
 }
 
+// Confetti component for celebration
+function Confetti({ count = 50 }: { count?: number }) {
+  const colors = ['#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8'];
+  
+  return (
+    <div className="fixed inset-0 pointer-events-none overflow-hidden z-50">
+      {Array.from({ length: count }).map((_, i) => {
+        const color = colors[i % colors.length];
+        const left = Math.random() * 100;
+        const delay = Math.random() * 2;
+        const size = 8 + Math.random() * 8;
+        const duration = 2 + Math.random() * 2;
+        
+        return (
+          <div
+            key={i}
+            className="absolute top-0"
+            style={{
+              left: `${left}%`,
+              width: `${size}px`,
+              height: `${size}px`,
+              backgroundColor: color,
+              borderRadius: Math.random() > 0.5 ? '50%' : '2px',
+              animation: `confetti-fall ${duration}s linear ${delay}s forwards`,
+              transform: `rotate(${Math.random() * 360}deg)`,
+            }}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
 export function AchievementToast({ achievement, className }: AchievementToastProps) {
   const { t } = useLanguage();
+  const [showConfetti, setShowConfetti] = useState(true);
   const Icon = achievement.icon;
+
+  // Hide confetti after animation
+  useEffect(() => {
+    const timer = setTimeout(() => setShowConfetti(false), 4000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const tierColors = {
     1: 'from-emerald-500/20 to-emerald-600/10 border-emerald-500/50',
@@ -38,47 +79,60 @@ export function AchievementToast({ achievement, className }: AchievementToastPro
   };
 
   return (
-    <div className={cn(
-      'flex items-center gap-4 p-4 rounded-xl border bg-gradient-to-r animate-fade-in-up',
-      tierColors[achievement.tier],
-      className
-    )}>
-      {/* Icon with glow */}
+    <>
+      {/* Confetti for high-tier achievements */}
+      {showConfetti && achievement.tier >= 3 && <Confetti count={achievement.tier === 4 ? 80 : 40} />}
+      
       <div className={cn(
-        'relative w-14 h-14 rounded-xl flex items-center justify-center',
-        achievement.tier === 4 ? 'bg-gold/20' : 'bg-primary/20'
+        'flex items-center gap-4 p-4 rounded-xl border bg-gradient-to-r animate-bounce-in',
+        tierColors[achievement.tier],
+        achievement.tier === 4 && 'animate-glow-pulse',
+        className
       )}>
-        <Icon className={cn('w-7 h-7', achievement.color)} />
-        {achievement.tier === 4 && (
-          <div className="absolute inset-0 rounded-xl animate-pulse bg-gold/10" />
-        )}
-      </div>
+        {/* Icon with glow */}
+        <div className={cn(
+          'relative w-14 h-14 rounded-xl flex items-center justify-center animate-celebrate',
+          achievement.tier === 4 ? 'bg-gold/20' : 'bg-primary/20'
+        )}>
+          <Icon className={cn('w-7 h-7', achievement.color)} />
+          {achievement.tier === 4 && (
+            <div className="absolute inset-0 rounded-xl animate-pulse bg-gold/10" />
+          )}
+          {/* Sparkle effects for legendary */}
+          {achievement.tier === 4 && (
+            <>
+              <Sparkles className="absolute -top-2 -right-2 w-4 h-4 text-gold animate-pulse" />
+              <Sparkles className="absolute -bottom-2 -left-2 w-3 h-3 text-gold animate-pulse" style={{ animationDelay: '0.5s' }} />
+            </>
+          )}
+        </div>
 
-      {/* Content */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-1">
-          <Trophy className="w-4 h-4 text-gold" />
-          <span className="text-xs font-medium text-gold">
-            {t('إنجاز جديد!', 'New Achievement!')}
-          </span>
-          <span className={cn(
-            'text-[10px] px-1.5 py-0.5 rounded-full',
-            achievement.tier === 1 && 'bg-emerald-500/20 text-emerald-400',
-            achievement.tier === 2 && 'bg-blue-500/20 text-blue-400',
-            achievement.tier === 3 && 'bg-purple-500/20 text-purple-400',
-            achievement.tier === 4 && 'bg-gold/20 text-gold',
-          )}>
-            {tierLabels[achievement.tier]}
-          </span>
-        </div>
-        <div className="font-bold text-foreground">
-          {t(achievement.name_ar, achievement.name_en)}
-        </div>
-        <div className="text-sm text-muted-foreground truncate">
-          {t(achievement.desc_ar, achievement.desc_en)}
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <Trophy className="w-4 h-4 text-gold" />
+            <span className="text-xs font-medium text-gold">
+              {t('إنجاز جديد!', 'New Achievement!')}
+            </span>
+            <span className={cn(
+              'text-[10px] px-1.5 py-0.5 rounded-full',
+              achievement.tier === 1 && 'bg-emerald-500/20 text-emerald-400',
+              achievement.tier === 2 && 'bg-blue-500/20 text-blue-400',
+              achievement.tier === 3 && 'bg-purple-500/20 text-purple-400',
+              achievement.tier === 4 && 'bg-gold/20 text-gold',
+            )}>
+              {tierLabels[achievement.tier]}
+            </span>
+          </div>
+          <div className="font-bold text-foreground">
+            {t(achievement.name_ar, achievement.name_en)}
+          </div>
+          <div className="text-sm text-muted-foreground truncate">
+            {t(achievement.desc_ar, achievement.desc_en)}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

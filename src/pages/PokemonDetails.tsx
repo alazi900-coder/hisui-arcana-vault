@@ -15,6 +15,7 @@ import { getWeaknesses, getResistances, getImmunities } from '@/lib/type-chart';
 import { getReliableImageSources } from '@/lib/pokemon-images';
 import { LivingDexProgress } from '@/components/LivingDexProgress';
 import { CatchHelper } from '@/components/CatchHelper';
+import { MoveAdvisor } from '@/components/MoveAdvisor';
 import type { Pokemon, Spawn, Location, Move, LearnsetEntry, PokemonType } from '@/types/pokemon';
 
 // Type gradient backgrounds
@@ -1191,7 +1192,10 @@ export default function PokemonDetails() {
           </TabsContent>
 
           {/* Moves Tab */}
-          <TabsContent value="moves">
+          <TabsContent value="moves" className="space-y-4">
+            <div className="flex justify-end">
+              <MoveAdvisor pokemon={pokemon} moves={allMoves || []} />
+            </div>
             <MovesList learnset={pokemon.learnset || []} moves={allMoves || []} />
           </TabsContent>
 
