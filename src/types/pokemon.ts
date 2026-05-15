@@ -75,6 +75,33 @@ export interface PokemonMetadata {
   egg_groups?: EggGroup[];
 }
 
+export type ResearchLevel = 'none' | 'complete' | 'perfect';
+
+export interface OutbreakEntry {
+  /** stable id: `${pokemonId}-${locationId}-${createdAt}` */
+  id: string;
+  pokemonId: string;
+  locationId: string;
+  /** Massive Mass Outbreak flag (distortion). */
+  massive: boolean;
+  /** Caught/defeated count in this outbreak. */
+  count: number;
+  shinyCharm: boolean;
+  research: ResearchLevel;
+  createdAt: number;
+  updatedAt: number;
+  active: boolean;
+  notes?: string;
+}
+
+export interface ShinyChainEntry {
+  pokemonId: string;
+  count: number;
+  shinyCharm: boolean;
+  research: ResearchLevel;
+  updatedAt: number;
+}
+
 export interface LearnsetEntry {
   move_id: string;
   method: 'level' | 'tutor' | 'evolution';

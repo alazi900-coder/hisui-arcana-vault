@@ -32,6 +32,7 @@ const toolsLinks = [
   { path: '/team-builder', icon: Users, labelAr: 'بناء الفريق', labelEn: 'Team Builder', color: 'bg-primary/20 text-primary' },
   { path: '/damage-calculator', icon: Calculator, labelAr: 'حاسبة الضرر', labelEn: 'Damage Calc', color: 'bg-destructive/20 text-destructive' },
   { path: '/battle-simulator', icon: Gamepad2, labelAr: 'محاكي المعركة', labelEn: 'Battle Sim', color: 'bg-type-fighting/20 text-type-fighting' },
+  { path: '/outbreaks', icon: Sparkles, labelAr: 'الانتشارات والشاينيس', labelEn: 'Outbreaks', color: 'bg-amber-400/20 text-amber-400' },
   { path: '/type-chart', icon: Grid3X3, labelAr: 'مخطط الأنواع', labelEn: 'Type Chart', color: 'bg-accent/20 text-accent' },
   { path: '/favorites', icon: Heart, labelAr: 'المفضلة', labelEn: 'Favorites', color: 'bg-type-fire/20 text-type-fire' },
   { path: '/tracker', icon: Target, labelAr: 'المتتبع', labelEn: 'Tracker', color: 'bg-gold/20 text-gold' },
