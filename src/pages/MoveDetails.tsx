@@ -1,10 +1,22 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, addRecent } from '@/lib/db';
-import { ChevronLeft, ChevronRight, Sword, Sparkles, CircleDot, Zap, Target, Battery } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Sword,
+  Sparkles,
+  CircleDot,
+  Zap,
+  Target,
+  Battery,
+  Users,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { buildLearnedByIndex } from '@/lib/pokemon-data';
+import type { LearnsetEntry } from '@/types/pokemon';
 
 export default function MoveDetails() {
   const { id } = useParams<{ id: string }>();
@@ -19,6 +31,19 @@ export default function MoveDetails() {
     }
   }, [id]);
   const allMoves = useLiveQuery(() => db.moves.toArray(), []);
+  const allPokemon = useLiveQuery(() => db.pokemon.toArray(), []);
+
+  const learnedBy = useMemo(() => {
+    if (!allPokemon || !id) return [] as { id: string; name_ar: string; name_en: string; dex_no: number; entry: LearnsetEntry }[];
+    const index = buildLearnedByIndex(allPokemon);
+    return (index.get(id) ?? []).map(row => ({
+      id: row.pokemon.id,
+      name_ar: row.pokemon.name_ar,
+      name_en: row.pokemon.name_en,
+      dex_no: row.pokemon.dex_no,
+      entry: row.entry,
+    })).sort((a, b) => a.dex_no - b.dex_no);
+  }, [allPokemon, id]);
 
   if (!move) {
     return (
@@ -164,6 +189,42 @@ export default function MoveDetails() {
             <p className="text-foreground leading-relaxed">
               {t(move.description_ar, move.description_en)}
             </p>
+          </div>
+
+          {/* Learned by */}
+          <div className="glass rounded-xl p-4 mt-4">
+            <h2 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
+              <Users className="w-4 h-4" />
+              {t('البوكيمون الذي يتعلمه', 'Pokémon that learn this move')}
+              <span className="text-xs ms-auto text-muted-foreground/70">
+                {learnedBy.length}
+              </span>
+            </h2>
+            {learnedBy.length === 0 ? (
+              <p className="text-sm text-muted-foreground py-2">
+                {t('لا يوجد بوكيمون يتعلم هذه الحركة في هيسوي.', 'No Pokémon in Hisui learn this move.')}
+              </p>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {learnedBy.map(({ id: pid, name_ar, name_en, dex_no, entry }) => (
+                  <Link
+                    key={`${pid}-${entry.method}-${entry.level ?? ''}`}
+                    to={`/pokemon/${pid}`}
+                    className="group flex items-center gap-2 px-3 py-1.5 rounded-full border border-border/40 bg-secondary/40 hover:bg-secondary/70 hover:border-primary/40 transition-all text-sm"
+                  >
+                    <span className="text-xs text-muted-foreground">
+                      #{String(dex_no).padStart(3, '0')}
+                    </span>
+                    <span className="font-medium">
+                      {t(name_ar, name_en)}
+                    </span>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-background/50 text-muted-foreground capitalize">
+                      {entry.method === 'level' ? `Lv ${entry.level}` : entry.method}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

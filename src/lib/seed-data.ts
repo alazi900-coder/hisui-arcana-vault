@@ -2,13 +2,29 @@ import type { Pokemon, Move, Location, Spawn, Item, Request, Recipe } from '@/ty
 import hisuiPokemon from '@/data/hisui-pokemon';
 import { hisuiMoves } from '@/data/hisui-moves';
 import { hisuiItems } from '@/data/hisui-items';
-import { hisuiLearnsets, defaultLearnset } from '@/data/hisui-learnsets';
+import { hisuiLearnsets } from '@/data/hisui-learnsets';
 import { hisuiSpawns } from '@/data/hisui-spawns';
-// Apply learnsets to Pokemon
-const pokemonWithLearnsets = hisuiPokemon.map(pokemon => ({
-  ...pokemon,
-  learnset: hisuiLearnsets[pokemon.id] || defaultLearnset
-}));
+import { generateDefaultLearnset, inferEvolutionMethod, inferEvolutionValue } from './pokemon-data';
+
+// Pokémon without a curated learnset get a type-aware fallback set so the
+// "Moves" tab is never empty. Once curated data lands, the override wins.
+const availableMoveIds = new Set(hisuiMoves.map(m => m.id));
+
+const pokemonWithLearnsets: Pokemon[] = hisuiPokemon.map(pokemon => {
+  const curated = hisuiLearnsets[pokemon.id];
+  const learnset = curated && curated.length > 0
+    ? curated
+    : generateDefaultLearnset(pokemon.types, availableMoveIds);
+
+  // Enrich each evolution row with structured method + value derived from text.
+  const evolutions = pokemon.evolutions.map(evo => ({
+    ...evo,
+    method: evo.method ?? inferEvolutionMethod(evo),
+    value: evo.value ?? inferEvolutionValue(evo),
+  }));
+
+  return { ...pokemon, learnset, evolutions };
+});
 
 // Re-export hisuiPokemon as seedPokemon with learnsets
 export const seedPokemon = pokemonWithLearnsets;

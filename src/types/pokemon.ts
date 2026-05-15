@@ -19,10 +19,60 @@ export interface Stats {
   spe: number;
 }
 
+export type EvolutionMethod =
+  | 'level'
+  | 'item'
+  | 'stone'
+  | 'trade'
+  | 'friendship'
+  | 'move'
+  | 'time'
+  | 'location'
+  | 'special';
+
 export interface Evolution {
   to_id: string;
   conditions_ar: string;
   conditions_en: string;
+  /**
+   * Optional structured trigger inferred from the human-readable conditions.
+   * Used by the UI to render method-specific badges and icons.
+   */
+  method?: EvolutionMethod;
+  /** Optional numeric value associated with the method (e.g. level number). */
+  value?: number;
+}
+
+export type EggGroup =
+  | 'monster'
+  | 'water1'
+  | 'water2'
+  | 'water3'
+  | 'bug'
+  | 'flying'
+  | 'field'
+  | 'fairy'
+  | 'grass'
+  | 'humanlike'
+  | 'mineral'
+  | 'amorphous'
+  | 'dragon'
+  | 'ditto'
+  | 'undiscovered'
+  | 'no-eggs';
+
+export interface PokemonMetadata {
+  /** 0..255, lower = harder to catch. */
+  catch_rate?: number;
+  /** Base EXP yield. */
+  base_exp?: number;
+  /** 0..255, lower = harder to befriend. */
+  base_friendship?: number;
+  /** Probability of male, in tenths (e.g. 5 = 50% male, -1 = genderless). */
+  gender_rate?: number;
+  /** Number of steps to hatch an egg in mainline games (not PLA). */
+  hatch_steps?: number;
+  egg_groups?: EggGroup[];
 }
 
 export interface LearnsetEntry {
@@ -49,6 +99,8 @@ export interface Pokemon {
   };
   learnset: LearnsetEntry[];
   spawn_refs: string[];
+  /** Optional extra metadata used by the Breeding / Encounter sections. */
+  meta?: PokemonMetadata;
 }
 
 export interface Spawn {
