@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { clearAllData } from '@/lib/db';
 import { reloadAllData } from '@/lib/seed-data';
 import { OfflineDownloadManager } from '@/components/OfflineDownloadManager';
+import { CloudSyncCard } from '@/components/CloudSyncCard';
 import { getImageCacheStats, clearImageCache, formatBytes, getLastDownloadTime } from '@/hooks/use-offline-download';
 import {
   AlertDialog,
@@ -112,6 +113,9 @@ export default function SettingsPage() {
         </div>
 
         <div className="space-y-4">
+          {/* Cloud Sync */}
+          <CloudSyncCard />
+
           {/* Offline Download Manager */}
           <OfflineDownloadManager onComplete={handleDownloadComplete} />
 
