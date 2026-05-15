@@ -5,6 +5,11 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+interface TeamMember {
+  name: string;
+  types: string[];
+}
+
 const TEAM_ANALYSIS_PROMPT = `You are a Pokémon team analysis expert for Pokémon Legends: Arceus.
 
 Analyze the given team and provide:
@@ -39,7 +44,8 @@ serve(async (req) => {
       });
     }
 
-    const teamDescription = team.map((p: any, i: number) => 
+    const teamTyped = team as TeamMember[];
+    const teamDescription = teamTyped.map((p, i) => 
       `${i + 1}. ${p.name} (${p.types.join('/')})`
     ).join('\n');
 
@@ -47,7 +53,7 @@ serve(async (req) => {
       ? `حلل هذا الفريق:\n${teamDescription}`
       : `Analyze this team:\n${teamDescription}`;
 
-    console.log("Analyzing team:", team.map((p: any) => p.name).join(', '));
+    console.log("Analyzing team:", teamTyped.map((p) => p.name).join(', '));
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

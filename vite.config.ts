@@ -167,4 +167,26 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    chunkSizeWarningLimit: 700,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          "react-vendor": ["react", "react-dom", "react-router-dom"],
+          "ui-vendor": [
+            "@radix-ui/react-dialog",
+            "@radix-ui/react-dropdown-menu",
+            "@radix-ui/react-popover",
+            "@radix-ui/react-select",
+            "@radix-ui/react-tabs",
+            "@radix-ui/react-tooltip",
+            "@radix-ui/react-toast",
+          ],
+          "chart-vendor": ["recharts"],
+          "data-vendor": ["dexie", "dexie-react-hooks", "@tanstack/react-query"],
+          "form-vendor": ["react-hook-form", "@hookform/resolvers", "zod"],
+        },
+      },
+    },
+  },
 }));
