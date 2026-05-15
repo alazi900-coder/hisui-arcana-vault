@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Settings as SettingsIcon, Globe, Minimize2, Lock, Database, Trash2, Download, Upload, HardDrive, Image, AlertCircle } from 'lucide-react';
+import { Settings as SettingsIcon, Globe, Minimize2, Lock, Database, Trash2, Download, Upload, HardDrive, Image, AlertCircle, Sparkles } from 'lucide-react';
+import { useAiEnabled } from '@/hooks/use-ai-enabled';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,6 +25,7 @@ import {
 
 export default function SettingsPage() {
   const { lang, setLang, t } = useLanguage();
+  const { aiEnabled, setAiEnabled } = useAiEnabled();
   const [reduceMotion, setReduceMotion] = useState(false);
   const [pinEnabled, setPinEnabled] = useState(false);
   const [pin, setPin] = useState('');
@@ -115,6 +117,31 @@ export default function SettingsPage() {
         <div className="space-y-4">
           {/* Cloud Sync */}
           <CloudSyncCard />
+
+          {/* AI Features */}
+          <div className="glass rounded-xl p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Sparkles className="w-5 h-5 text-primary" />
+                <div>
+                  <div className="font-medium">{t('المساعد الذكي', 'AI Assistant')}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {t('الدردشة، مستشار الحركات، ومساعد الصيد', 'Chat, move advisor, and catch helper')}
+                  </div>
+                </div>
+              </div>
+              <Switch
+                checked={aiEnabled}
+                onCheckedChange={setAiEnabled}
+              />
+            </div>
+            <p className="text-[11px] text-muted-foreground mt-3">
+              {t(
+                'يتطلب إعداد LOVABLE_API_KEY في Supabase Edge Functions لتفعيل الإجابات.',
+                'Requires LOVABLE_API_KEY to be set in Supabase Edge Functions to receive responses.',
+              )}
+            </p>
+          </div>
 
           {/* Offline Download Manager */}
           <OfflineDownloadManager onComplete={handleDownloadComplete} />
