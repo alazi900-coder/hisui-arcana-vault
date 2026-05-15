@@ -228,6 +228,7 @@ export interface AppSettings {
   reduceMotion: boolean;
   pinEnabled: boolean;
   pin?: string;
+  aiEnabled?: boolean;
 }
 
 export interface FavoriteItem {

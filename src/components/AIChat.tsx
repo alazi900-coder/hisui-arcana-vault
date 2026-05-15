@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { classifyAiError, parseSseChunk } from '@/lib/ai';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -20,19 +21,28 @@ interface AIChatProps {
   };
 }
 
-const SUGGESTED_QUESTIONS = [
-  "ما هو أفضل فريق ضد Alpha Pokémon؟",
-  "كيف أطور Eevee إلى Leafeon؟",
-  "What beats Garchomp?",
-  "أين أجد Pichu؟",
+const SUGGESTED_QUESTIONS_AR = [
+  'ما هو أفضل فريق ضد Alpha Pokémon؟',
+  'كيف أطور Eevee إلى Leafeon؟',
+  'ما الذي يهزم Garchomp؟',
+  'أين أجد Pichu؟',
+];
+
+const SUGGESTED_QUESTIONS_EN = [
+  'What is the best team against Alpha Pokémon?',
+  'How do I evolve Eevee into Leafeon?',
+  'What beats Garchomp?',
+  'Where can I find Pichu?',
 ];
 
 export function AIChat({ isOpen, onClose, context }: AIChatProps) {
+  const { t, lang } = useLanguage();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const suggested = lang === 'ar' ? SUGGESTED_QUESTIONS_AR : SUGGESTED_QUESTIONS_EN;
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -70,13 +80,10 @@ export function AIChat({ isOpen, onClose, context }: AIChatProps) {
       );
 
       if (!response.ok) {
-        if (response.status === 429) {
-          throw new Error('تم تجاوز الحد المسموح. حاول لاحقاً.');
-        }
-        if (response.status === 402) {
-          throw new Error('نفدت رصيد AI. يرجى إضافة رصيد.');
-        }
-        throw new Error('فشل الاتصال بالمساعد الذكي');
+        let bodyText = '';
+        try { bodyText = await response.text(); } catch { /* ignore */ }
+        const cls = classifyAiError(response.status, bodyText);
+        throw new Error(lang === 'ar' ? cls.text_ar : cls.text_en);
       }
 
       const reader = response.body?.getReader();
@@ -88,46 +95,32 @@ export function AIChat({ isOpen, onClose, context }: AIChatProps) {
       setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
 
       let buffer = '';
-      while (true) {
+      let streamDone = false;
+      while (!streamDone) {
         const { done, value } = await reader.read();
         if (done) break;
-
-        buffer += decoder.decode(value, { stream: true });
-
-        // Process SSE lines
-        const lines = buffer.split('\n');
-        buffer = lines.pop() || '';
-
-        for (const line of lines) {
-          if (!line.startsWith('data: ')) continue;
-          const jsonStr = line.slice(6).trim();
-          if (jsonStr === '[DONE]') continue;
-
-          try {
-            const parsed = JSON.parse(jsonStr);
-            const content = parsed.choices?.[0]?.delta?.content;
-            if (content) {
-              assistantContent += content;
-              setMessages(prev => {
-                const updated = [...prev];
-                const lastIdx = updated.length - 1;
-                if (updated[lastIdx]?.role === 'assistant') {
-                  updated[lastIdx] = { ...updated[lastIdx], content: assistantContent };
-                }
-                return updated;
-              });
+        const chunk = decoder.decode(value, { stream: true });
+        const parsed = parseSseChunk(buffer, chunk);
+        buffer = parsed.leftover;
+        streamDone = parsed.done;
+        if (parsed.delta) {
+          assistantContent += parsed.delta;
+          setMessages(prev => {
+            const updated = [...prev];
+            const lastIdx = updated.length - 1;
+            if (updated[lastIdx]?.role === 'assistant') {
+              updated[lastIdx] = { ...updated[lastIdx], content: assistantContent };
             }
-          } catch {
-            // Incomplete JSON, continue
-          }
+            return updated;
+          });
         }
       }
 
     } catch (error) {
       console.error('AI Chat error:', error);
       toast({
-        title: 'خطأ',
-        description: error instanceof Error ? error.message : 'حدث خطأ غير متوقع',
+        title: t('خطأ', 'Error'),
+        description: error instanceof Error ? error.message : t('حدث خطأ غير متوقع', 'An unexpected error occurred'),
         variant: 'destructive',
       });
       // Remove the empty assistant message on error
@@ -155,8 +148,8 @@ export function AIChat({ isOpen, onClose, context }: AIChatProps) {
               <Sparkles className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <h3 className="font-semibold">مساعد البوكيمون الذكي</h3>
-              <p className="text-xs text-muted-foreground">اسألني أي شيء عن Hisui!</p>
+              <h3 className="font-semibold">{t('مساعد البوكيمون الذكي', 'Pokémon AI Assistant')}</h3>
+              <p className="text-xs text-muted-foreground">{t('اسألني أي شيء عن Hisui!', 'Ask me anything about Hisui!')}</p>
             </div>
           </div>
           <Button variant="ghost" size="icon" onClick={onClose}>
@@ -170,13 +163,13 @@ export function AIChat({ isOpen, onClose, context }: AIChatProps) {
             <div className="space-y-4">
               <div className="text-center text-muted-foreground py-8">
                 <Bot className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                <p>مرحباً! أنا مساعدك الذكي للبوكيمون.</p>
-                <p className="text-sm">اسألني عن الأنواع، الفرق، التطور، أو أي شيء!</p>
+                <p>{t('مرحباً! أنا مساعدك الذكي للبوكيمون.', 'Hi! I am your Pokémon AI assistant.')}</p>
+                <p className="text-sm">{t('اسألني عن الأنواع، الفرق، التطور، أو أي شيء!', 'Ask me about types, teams, evolutions — anything!')}</p>
               </div>
               <div className="space-y-2">
-                <p className="text-xs text-muted-foreground">أسئلة مقترحة:</p>
+                <p className="text-xs text-muted-foreground">{t('أسئلة مقترحة:', 'Suggested questions:')}</p>
                 <div className="flex flex-wrap gap-2">
-                  {SUGGESTED_QUESTIONS.map((q, i) => (
+                  {suggested.map((q, i) => (
                     <Button
                       key={i}
                       variant="outline"
@@ -241,7 +234,7 @@ export function AIChat({ isOpen, onClose, context }: AIChatProps) {
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="اكتب سؤالك هنا..."
+              placeholder={t('اكتب سؤالك هنا...', 'Type your question here...')}
               disabled={isLoading}
               className="flex-1"
             />
