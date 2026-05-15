@@ -1,7 +1,8 @@
 import Dexie, { Table } from 'dexie';
 import type { 
   Pokemon, Move, Item, Recipe, Location, Spawn, Request,
-  AppSettings, FavoriteItem, RecentItem, LivingDexEntry 
+  AppSettings, FavoriteItem, RecentItem, LivingDexEntry,
+  OutbreakEntry, ShinyChainEntry
 } from '@/types/pokemon';
 import type { InventoryEntry } from '@/types/save-data';
 
@@ -19,6 +20,8 @@ export class PLADexDatabase extends Dexie {
   metadata!: Table<{ key: string; value: string }, string>;
   livingDex!: Table<LivingDexEntry, string>;
   inventory!: Table<InventoryEntry, string>;
+  outbreaks!: Table<OutbreakEntry, string>;
+  shinyChains!: Table<ShinyChainEntry, string>;
 
   constructor() {
     super('PLADexX');
@@ -68,6 +71,25 @@ export class PLADexDatabase extends Dexie {
       metadata: 'key',
       livingDex: 'pokemon_id, caught, alpha, shiny, updated_at',
       inventory: 'item_id, quantity, updated_at',
+    });
+
+    // Outbreak + shiny chain tracking (v4)
+    this.version(4).stores({
+      pokemon: 'id, dex_no, name_ar, name_en, *types, *tags',
+      moves: 'id, name_ar, name_en, type, category',
+      items: 'id, name_ar, name_en, type',
+      recipes: 'id, name_ar, name_en',
+      locations: 'id, name_ar, name_en, region',
+      spawns: 'id, pokemon_id, location_id, rarity, is_alpha',
+      requests: 'id, title_ar, title_en, location_id',
+      settings: '++id',
+      favorites: '[type+id], type, addedAt',
+      recents: 'id, type, viewedAt',
+      metadata: 'key',
+      livingDex: 'pokemon_id, caught, alpha, shiny, updated_at',
+      inventory: 'item_id, quantity, updated_at',
+      outbreaks: 'id, pokemonId, locationId, active, updatedAt',
+      shinyChains: 'pokemonId, updatedAt',
     });
   }
 }
