@@ -16,7 +16,7 @@ import { useAchievementChecker } from "@/hooks/use-achievements";
 import { Loader2 } from "lucide-react";
 
 // Current data version - increment when seed data changes
-const DATA_VERSION = "v2.1";
+const DATA_VERSION = "v2.2";
 
 // Lazy loaded pages for better performance
 const Index = lazy(() => import("./pages/Index"));
