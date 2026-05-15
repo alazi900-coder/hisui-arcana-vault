@@ -222,9 +222,11 @@ export interface DataPack {
   requests: Request[];
 }
 
+export type ThemeName = 'dark' | 'light' | 'midnight';
+
 export interface AppSettings {
-  language: 'ar' | 'en';
-  theme: 'dark';
+  language: 'ar' | 'en' | 'ja';
+  theme: ThemeName;
   reduceMotion: boolean;
   pinEnabled: boolean;
   pin?: string;
