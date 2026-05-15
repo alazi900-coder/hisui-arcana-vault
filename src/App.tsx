@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import { HelmetProvider } from "react-helmet-async";
 import { Header } from "@/components/Header";
 import { Navigation } from "@/components/Navigation";
@@ -182,8 +183,9 @@ const App = () => {
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <LanguageProvider>
-          <AuthProvider>
-            <TooltipProvider>
+          <ThemeProvider>
+            <AuthProvider>
+              <TooltipProvider>
             <Toaster />
             <Sonner />
             <BrowserRouter>
@@ -191,8 +193,9 @@ const App = () => {
                 <AppContent />
               </ErrorBoundary>
             </BrowserRouter>
-            </TooltipProvider>
-          </AuthProvider>
+              </TooltipProvider>
+            </AuthProvider>
+          </ThemeProvider>
         </LanguageProvider>
       </QueryClientProvider>
     </HelmetProvider>

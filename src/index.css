@@ -90,7 +90,65 @@
     --gold-foreground: 220 20% 4%;
   }
 
-  /* Force dark mode always */
+  /* Light Theme overrides */
+  html[data-theme="light"] {
+    color-scheme: light;
+    --background: 210 30% 98%;
+    --foreground: 220 25% 12%;
+    --card: 210 30% 100%;
+    --card-foreground: 220 25% 12%;
+    --popover: 210 30% 100%;
+    --popover-foreground: 220 25% 12%;
+    --primary: 185 80% 38%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 20% 92%;
+    --secondary-foreground: 220 25% 18%;
+    --muted: 210 20% 94%;
+    --muted-foreground: 220 15% 40%;
+    --accent: 310 70% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 210 20% 82%;
+    --input: 210 20% 88%;
+    --ring: 185 80% 38%;
+    --sidebar-background: 210 30% 96%;
+    --sidebar-foreground: 220 25% 12%;
+    --sidebar-primary: 185 80% 38%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 20% 90%;
+    --sidebar-accent-foreground: 220 25% 18%;
+    --sidebar-border: 210 20% 80%;
+    --sidebar-ring: 185 80% 38%;
+    --gradient-cosmic: linear-gradient(135deg, hsl(210 30% 100%) 0%, hsl(220 20% 96%) 100%);
+    --gradient-glow: linear-gradient(135deg, hsl(185 80% 38% / 0.15) 0%, hsl(310 70% 50% / 0.15) 100%);
+  }
+
+  /* Midnight Theme — deeper indigo than the default cosmic dark */
+  html[data-theme="midnight"] {
+    color-scheme: dark;
+    --background: 245 35% 6%;
+    --foreground: 240 30% 96%;
+    --card: 245 35% 10%;
+    --card-foreground: 240 30% 96%;
+    --popover: 245 40% 12%;
+    --popover-foreground: 240 30% 96%;
+    --primary: 270 90% 65%;
+    --primary-foreground: 245 35% 6%;
+    --secondary: 245 30% 16%;
+    --secondary-foreground: 240 30% 96%;
+    --muted: 245 25% 18%;
+    --muted-foreground: 245 20% 60%;
+    --accent: 330 90% 65%;
+    --accent-foreground: 245 35% 6%;
+    --border: 245 30% 22%;
+    --input: 245 30% 20%;
+    --ring: 270 90% 65%;
+    --gradient-cosmic: linear-gradient(135deg, hsl(245 40% 10%) 0%, hsl(285 40% 12%) 100%);
+    --gradient-glow: linear-gradient(135deg, hsl(270 90% 65% / 0.22) 0%, hsl(330 90% 65% / 0.22) 100%);
+  }
+
+  /* Default to dark color-scheme when no theme attribute is set yet. */
   html {
     color-scheme: dark;
   }

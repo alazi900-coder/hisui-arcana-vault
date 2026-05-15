@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { Settings as SettingsIcon, Globe, Minimize2, Lock, Database, Trash2, Download, Upload, HardDrive, Image, AlertCircle, Sparkles } from 'lucide-react';
+import { useLanguage, LANGUAGE_OPTIONS, type Language } from '@/contexts/LanguageContext';
+import { useTheme, THEME_OPTIONS } from '@/contexts/ThemeContext';
+import type { ThemeName } from '@/types/pokemon';
+import { Settings as SettingsIcon, Globe, Minimize2, Lock, Database, Trash2, Download, Upload, HardDrive, Image, AlertCircle, Sparkles, Sun, Moon, Star } from 'lucide-react';
 import { useAiEnabled } from '@/hooks/use-ai-enabled';
+import { cn } from '@/lib/utils';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,6 +28,7 @@ import {
 
 export default function SettingsPage() {
   const { lang, setLang, t } = useLanguage();
+  const { theme, setTheme } = useTheme();
   const { aiEnabled, setAiEnabled } = useAiEnabled();
   const [reduceMotion, setReduceMotion] = useState(false);
   const [pinEnabled, setPinEnabled] = useState(false);
@@ -39,8 +43,8 @@ export default function SettingsPage() {
     setLastDownload(getLastDownloadTime());
   }, []);
 
-  const handleLanguageToggle = () => {
-    setLang(lang === 'ar' ? 'en' : 'ar');
+  const handleLanguageChange = (next: Language) => {
+    setLang(next);
   };
 
   const handleReloadSeed = async () => {
@@ -206,20 +210,70 @@ export default function SettingsPage() {
 
           {/* Language */}
           <div className="glass rounded-xl p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Globe className="w-5 h-5 text-primary" />
-                <div>
-                  <div className="font-medium">{t('اللغة', 'Language')}</div>
-                  <div className="text-sm text-muted-foreground">
-                    {lang === 'ar' ? 'العربية' : 'English'}
-                  </div>
+            <div className="flex items-center gap-3 mb-3">
+              <Globe className="w-5 h-5 text-primary" />
+              <div>
+                <div className="font-medium">{t('اللغة', 'Language', '言語')}</div>
+                <div className="text-sm text-muted-foreground">
+                  {LANGUAGE_OPTIONS.find(l => l.code === lang)?.label}
                 </div>
               </div>
-              <Switch 
-                checked={lang === 'en'} 
-                onCheckedChange={handleLanguageToggle}
-              />
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {LANGUAGE_OPTIONS.map(opt => (
+                <button
+                  key={opt.code}
+                  onClick={() => handleLanguageChange(opt.code)}
+                  className={cn(
+                    'rounded-lg border px-3 py-2 text-sm font-medium transition-colors',
+                    lang === opt.code
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'border-border hover:bg-secondary/50',
+                  )}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Theme */}
+          <div className="glass rounded-xl p-4">
+            <div className="flex items-center gap-3 mb-3">
+              <Moon className="w-5 h-5 text-primary" />
+              <div>
+                <div className="font-medium">{t('المظهر', 'Theme', 'テーマ')}</div>
+                <div className="text-sm text-muted-foreground">
+                  {theme === 'dark' && t('كوني داكن (الإفتراضي)', 'Cosmic Dark (default)', 'コスミックダーク')}
+                  {theme === 'light' && t('فاتح', 'Light', 'ライト')}
+                  {theme === 'midnight' && t('منتصف الليل', 'Midnight Indigo', 'ミッドナイト')}
+                </div>
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {(THEME_OPTIONS as readonly ThemeName[]).map(opt => {
+                const Icon = opt === 'light' ? Sun : opt === 'midnight' ? Star : Moon;
+                const label = opt === 'dark'
+                  ? t('داكن', 'Dark', 'ダーク')
+                  : opt === 'light'
+                    ? t('فاتح', 'Light', 'ライト')
+                    : t('منتصف الليل', 'Midnight', 'ミッドナイト');
+                return (
+                  <button
+                    key={opt}
+                    onClick={() => setTheme(opt)}
+                    className={cn(
+                      'rounded-lg border px-3 py-2 text-sm font-medium transition-colors flex items-center justify-center gap-1.5',
+                      theme === opt
+                        ? 'border-primary bg-primary/10 text-primary'
+                        : 'border-border hover:bg-secondary/50',
+                    )}
+                  >
+                    <Icon className="w-4 h-4" />
+                    {label}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
