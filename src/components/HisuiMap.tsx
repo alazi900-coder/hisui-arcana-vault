@@ -9,12 +9,11 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { useLivingDexMap } from '@/hooks/use-living-dex';
-import { 
-  MapPin, 
-  Star, 
-  Sparkles, 
-  Sun, 
-  Moon, 
+import {
+  MapPin,
+  Sparkles,
+  Sun,
+  Moon,
   ChevronRight,
   Filter,
   X,
@@ -24,60 +23,77 @@ import {
   Target,
   TrendingUp,
   CheckCircle2,
-  Circle
+  Compass,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-// Region colors and positions for the map
-const REGION_CONFIG: Record<string, {
+type RegionConfig = {
   color: string;
-  gradient: string;
-  position: { top: string; left: string };
-  size: { width: string; height: string };
-  shape: string;
+  fill: string;
+  fillSelected: string;
+  stroke: string;
   icon: string;
-}> = {
-  'obsidian-fieldlands': {
-    color: 'hsl(120, 60%, 35%)',
-    gradient: 'from-green-600/80 to-emerald-800/80',
-    position: { top: '55%', left: '15%' },
-    size: { width: '25%', height: '30%' },
-    shape: 'polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 80% 100%, 20% 100%, 0% 70%, 0% 30%)',
-    icon: '🌲',
-  },
-  'crimson-mirelands': {
-    color: 'hsl(15, 70%, 45%)',
-    gradient: 'from-orange-600/80 to-red-900/80',
-    position: { top: '45%', left: '35%' },
-    size: { width: '22%', height: '28%' },
-    shape: 'polygon(20% 0%, 80% 0%, 100% 50%, 80% 100%, 20% 100%, 0% 50%)',
-    icon: '🏜️',
-  },
-  'cobalt-coastlands': {
-    color: 'hsl(200, 80%, 45%)',
-    gradient: 'from-blue-500/80 to-cyan-700/80',
-    position: { top: '60%', left: '55%' },
-    size: { width: '28%', height: '32%' },
-    shape: 'polygon(10% 0%, 90% 0%, 100% 20%, 100% 80%, 90% 100%, 10% 100%, 0% 80%, 0% 20%)',
-    icon: '🌊',
-  },
-  'coronet-highlands': {
-    color: 'hsl(260, 40%, 45%)',
-    gradient: 'from-purple-600/80 to-indigo-900/80',
-    position: { top: '15%', left: '40%' },
-    size: { width: '24%', height: '35%' },
-    shape: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
-    icon: '⛰️',
-  },
+  svgPath: string;
+  labelPos: { x: number; y: number };
+};
+
+// Stylized Hisui geographic layout — viewBox 0 0 300 360.
+// North (top) → Alabaster, Center → Coronet, West → Cobalt, East → Crimson, South → Obsidian.
+const REGION_CONFIG: Record<string, RegionConfig> = {
   'alabaster-icelands': {
     color: 'hsl(200, 30%, 75%)',
-    gradient: 'from-cyan-300/80 to-blue-400/80',
-    position: { top: '5%', left: '60%' },
-    size: { width: '30%', height: '28%' },
-    shape: 'polygon(20% 0%, 80% 0%, 100% 30%, 90% 100%, 10% 100%, 0% 30%)',
+    fill: 'hsl(200, 60%, 80%)',
+    fillSelected: 'hsl(200, 80%, 88%)',
+    stroke: 'hsl(200, 50%, 95%)',
     icon: '❄️',
+    svgPath: 'M 60 20 L 240 20 L 270 50 L 278 105 L 250 125 L 215 120 L 180 125 L 150 122 L 120 125 L 85 120 L 50 125 L 22 105 L 30 50 Z',
+    labelPos: { x: 150, y: 72 },
+  },
+  'coronet-highlands': {
+    color: 'hsl(260, 40%, 55%)',
+    fill: 'hsl(265, 45%, 50%)',
+    fillSelected: 'hsl(265, 70%, 62%)',
+    stroke: 'hsl(265, 60%, 75%)',
+    icon: '⛰️',
+    svgPath: 'M 120 125 L 150 122 L 180 125 L 198 170 L 195 220 L 175 248 L 150 256 L 125 248 L 105 220 L 102 170 Z',
+    labelPos: { x: 150, y: 195 },
+  },
+  'cobalt-coastlands': {
+    color: 'hsl(200, 80%, 50%)',
+    fill: 'hsl(205, 75%, 45%)',
+    fillSelected: 'hsl(205, 85%, 58%)',
+    stroke: 'hsl(205, 80%, 70%)',
+    icon: '🌊',
+    svgPath: 'M 22 105 L 50 125 L 85 120 L 102 170 L 105 220 L 92 262 L 60 278 L 30 268 L 10 228 L 6 168 Z',
+    labelPos: { x: 55, y: 195 },
+  },
+  'crimson-mirelands': {
+    color: 'hsl(15, 70%, 50%)',
+    fill: 'hsl(15, 65%, 48%)',
+    fillSelected: 'hsl(15, 80%, 60%)',
+    stroke: 'hsl(15, 75%, 72%)',
+    icon: '🏜️',
+    svgPath: 'M 278 105 L 250 125 L 215 120 L 198 170 L 195 220 L 208 262 L 240 278 L 270 268 L 290 228 L 294 168 Z',
+    labelPos: { x: 245, y: 195 },
+  },
+  'obsidian-fieldlands': {
+    color: 'hsl(120, 50%, 38%)',
+    fill: 'hsl(135, 45%, 38%)',
+    fillSelected: 'hsl(135, 60%, 48%)',
+    stroke: 'hsl(135, 50%, 65%)',
+    icon: '🌲',
+    svgPath: 'M 30 268 L 60 278 L 92 262 L 125 248 L 150 256 L 175 248 L 208 262 L 240 278 L 270 268 L 268 318 L 200 342 L 100 342 L 32 318 Z',
+    labelPos: { x: 150, y: 305 },
   },
 };
+
+const REGION_DRAW_ORDER: readonly string[] = [
+  'alabaster-icelands',
+  'crimson-mirelands',
+  'cobalt-coastlands',
+  'obsidian-fieldlands',
+  'coronet-highlands',
+];
 
 // Rarity colors
 const RARITY_CONFIG = {
@@ -338,148 +354,174 @@ export function HisuiMap({ className }: HisuiMapProps) {
         </div>
       )}
 
-      {/* Interactive Map */}
+      {/* Interactive Hisui SVG map */}
       <div className={cn(
-        "relative w-full bg-gradient-to-b from-background via-card to-background rounded-2xl overflow-hidden border border-border/50",
-        isFullscreen ? "aspect-auto flex-1" : "aspect-[4/3]"
+        "relative w-full bg-gradient-to-b from-background via-card/30 to-background rounded-2xl overflow-hidden border border-border/50",
+        isFullscreen && "flex-1"
       )}>
-        {/* Background decorations */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_hsl(185_100%_50%_/_0.05)_0%,_transparent_70%)]" />
-        <div className="absolute top-4 left-4 text-xs text-muted-foreground flex items-center gap-2">
-          <MapPin className="w-4 h-4" />
+        <div className="absolute top-3 left-3 text-xs text-muted-foreground flex items-center gap-1.5 z-10 pointer-events-none">
+          <MapPin className="w-3.5 h-3.5" />
           {t('منطقة هيسوي', 'Hisui Region')}
         </div>
 
-        {/* Central Mount Coronet indicator */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center animate-pulse">
-          <Sparkles className="w-4 h-4 text-primary" />
+        <svg
+          viewBox="0 0 300 360"
+          preserveAspectRatio="xMidYMid meet"
+          role="img"
+          aria-label={t('خريطة منطقة هيسوي', 'Map of the Hisui Region')}
+          className="w-full h-auto max-h-[70vh] block"
+        >
+          <defs>
+            <radialGradient id="hisuiOcean" cx="50%" cy="50%" r="60%">
+              <stop offset="0%" stopColor="hsl(210, 40%, 12%)" />
+              <stop offset="100%" stopColor="hsl(220, 50%, 6%)" />
+            </radialGradient>
+            <filter id="regionGlow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="2.5" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+
+          {/* Ocean / background */}
+          <rect x="0" y="0" width="300" height="360" fill="url(#hisuiOcean)" />
+
+          {/* Region polygons */}
+          {REGION_DRAW_ORDER.map((id) => {
+            const config = REGION_CONFIG[id];
+            const location = locations?.find((l) => l.id === id);
+            if (!config || !location) return null;
+
+            const isSelected = selectedRegion === id;
+            const stats = regionStats[id] || { total: 0, caught: 0, alpha: 0 };
+            const progress = stats.total > 0 ? Math.round((stats.caught / stats.total) * 100) : 0;
+            const name = isRTL ? location.name_ar : location.name_en;
+
+            return (
+              <g
+                key={id}
+                role="button"
+                tabIndex={0}
+                aria-label={`${name} — ${stats.caught}/${stats.total} (${progress}%)`}
+                aria-pressed={isSelected}
+                onClick={() => setSelectedRegion(isSelected ? null : id)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setSelectedRegion(isSelected ? null : id);
+                  }
+                }}
+                className="cursor-pointer focus:outline-none"
+                filter={isSelected ? 'url(#regionGlow)' : undefined}
+              >
+                <path
+                  d={config.svgPath}
+                  fill={isSelected ? config.fillSelected : config.fill}
+                  stroke={isSelected ? 'hsl(185, 100%, 60%)' : config.stroke}
+                  strokeWidth={isSelected ? 2.5 : 1.2}
+                  strokeLinejoin="round"
+                  className="transition-all duration-200 hover:brightness-110"
+                  style={{ opacity: isSelected ? 1 : 0.92 }}
+                />
+                <text
+                  x={config.labelPos.x}
+                  y={config.labelPos.y - 8}
+                  textAnchor="middle"
+                  className="select-none pointer-events-none"
+                  fill="white"
+                  fontSize="18"
+                  style={{ paintOrder: 'stroke', stroke: 'rgba(0,0,0,0.55)', strokeWidth: 3, strokeLinejoin: 'round' }}
+                >
+                  {config.icon}
+                </text>
+                <text
+                  x={config.labelPos.x}
+                  y={config.labelPos.y + 12}
+                  textAnchor="middle"
+                  className="select-none pointer-events-none"
+                  fill="white"
+                  fontSize="10"
+                  fontWeight="700"
+                  style={{ paintOrder: 'stroke', stroke: 'rgba(0,0,0,0.75)', strokeWidth: 3, strokeLinejoin: 'round' }}
+                >
+                  {name}
+                </text>
+                <text
+                  x={config.labelPos.x}
+                  y={config.labelPos.y + 26}
+                  textAnchor="middle"
+                  className="select-none pointer-events-none"
+                  fill="white"
+                  fontSize="9"
+                  fontWeight="600"
+                  style={{ paintOrder: 'stroke', stroke: 'rgba(0,0,0,0.75)', strokeWidth: 3, strokeLinejoin: 'round' }}
+                >
+                  {stats.caught}/{stats.total} · {progress}%
+                </text>
+              </g>
+            );
+          })}
+
+          {/* Mount Coronet marker (center) */}
+          <g pointerEvents="none">
+            <circle cx="150" cy="188" r="6" fill="hsl(50, 100%, 60%)" opacity="0.35">
+              <animate attributeName="r" values="5;9;5" dur="2.4s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.5;0;0.5" dur="2.4s" repeatCount="indefinite" />
+            </circle>
+            <circle cx="150" cy="188" r="3.5" fill="hsl(50, 100%, 70%)" stroke="white" strokeWidth="0.8" />
+          </g>
+        </svg>
+
+        {/* Compass rose */}
+        <div className="absolute bottom-3 right-3 w-10 h-10 rounded-full bg-background/60 border border-border/60 flex items-center justify-center text-[10px] text-muted-foreground pointer-events-none">
+          <div className="absolute inset-0 flex items-start justify-center pt-1 text-primary font-bold">N</div>
+          <Compass className="w-4 h-4 opacity-60" />
         </div>
+      </div>
 
-        {/* Region nodes */}
-        {locations?.map((location) => {
-          const config = REGION_CONFIG[location.id];
-          if (!config) return null;
+      {/* Region quick-select row */}
+      <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+        {REGION_DRAW_ORDER.map((id) => {
+          const config = REGION_CONFIG[id];
+          const location = locations?.find((l) => l.id === id);
+          if (!config || !location) return null;
 
-          const isSelected = selectedRegion === location.id;
-          const stats = (regionStats[location.id] as { total: number; caught: number; alpha: number }) || { total: 0, caught: 0, alpha: 0 };
+          const isSelected = selectedRegion === id;
+          const stats = regionStats[id] || { total: 0, caught: 0, alpha: 0 };
           const progress = stats.total > 0 ? Math.round((stats.caught / stats.total) * 100) : 0;
+          const name = isRTL ? location.name_ar : location.name_en;
 
           return (
             <button
-              key={location.id}
-              onClick={() => setSelectedRegion(isSelected ? null : location.id)}
+              key={id}
+              type="button"
+              onClick={() => setSelectedRegion(isSelected ? null : id)}
               className={cn(
-                "absolute transition-all duration-300 rounded-2xl group",
-                "hover:scale-110 hover:z-20",
-                isSelected && "scale-110 z-20"
+                'flex items-center gap-2 px-3 py-2 rounded-xl border text-left transition-all',
+                'bg-secondary/40 hover:bg-secondary/70',
+                isSelected
+                  ? 'border-primary ring-1 ring-primary/40 bg-primary/10'
+                  : 'border-border/50'
               )}
-              style={{
-                top: config.position.top,
-                left: config.position.left,
-                transform: 'translate(-50%, -50%)',
-              }}
+              aria-pressed={isSelected}
             >
-              {/* Region card */}
-              <div className={cn(
-                "relative px-4 py-3 rounded-2xl border backdrop-blur-sm transition-all duration-300",
-                "bg-gradient-to-br",
-                config.gradient,
-                isSelected 
-                  ? "border-primary shadow-lg shadow-primary/20 glow-cyan" 
-                  : "border-border/50 hover:border-primary/50"
-              )}>
-                {/* Progress ring */}
-                <div className="absolute -top-1 -right-1 w-6 h-6">
-                  <svg className="w-6 h-6 -rotate-90">
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      className="text-background/30"
-                    />
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeDasharray={`${progress * 0.628} 62.8`}
-                      className="text-primary"
-                    />
-                  </svg>
-                  <span className="absolute inset-0 flex items-center justify-center text-[8px] font-bold">
-                    {progress}%
-                  </span>
-                </div>
-
-                {/* Icon */}
-                <div className="text-2xl mb-1">{config.icon}</div>
-                
-                {/* Region name */}
-                <div className="text-sm font-bold text-foreground whitespace-nowrap">
-                  {isRTL ? location.name_ar : location.name_en}
-                </div>
-                
-                {/* Stats badges */}
-                <div className="flex items-center justify-center gap-1 mt-1">
-                  <Badge variant="outline" className="text-xs bg-background/50 gap-1">
-                    <CheckCircle2 className="w-3 h-3 text-green-500" />
-                    {stats.caught}
-                  </Badge>
-                  <Badge variant="outline" className="text-xs bg-background/50 gap-1">
-                    <Circle className="w-3 h-3 text-muted-foreground" />
-                    {stats.total}
-                  </Badge>
-                </div>
-
-                {/* Pulse ring when selected */}
-                {isSelected && (
-                  <div className="absolute -inset-2 rounded-2xl border-2 border-primary/50 animate-pulse" />
-                )}
-              </div>
+              <span
+                className="flex items-center justify-center w-8 h-8 rounded-lg shrink-0"
+                style={{ backgroundColor: config.fill }}
+              >
+                <span className="text-base leading-none">{config.icon}</span>
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-xs font-bold truncate">{name}</span>
+                <span className="block text-[10px] text-muted-foreground">
+                  {stats.caught}/{stats.total} · {progress}%
+                </span>
+              </span>
             </button>
           );
         })}
-
-        {/* Connection lines (decorative) */}
-        <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }}>
-          <defs>
-            <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="hsl(185 100% 50% / 0.2)" />
-              <stop offset="50%" stopColor="hsl(185 100% 50% / 0.4)" />
-              <stop offset="100%" stopColor="hsl(185 100% 50% / 0.2)" />
-            </linearGradient>
-          </defs>
-          {/* Connecting paths */}
-          <path
-            d="M 20% 55% Q 40% 50% 40% 35%"
-            fill="none"
-            stroke="url(#lineGradient)"
-            strokeWidth="1"
-            strokeDasharray="5 5"
-            className="animate-pulse"
-          />
-          <path
-            d="M 40% 45% Q 50% 55% 55% 60%"
-            fill="none"
-            stroke="url(#lineGradient)"
-            strokeWidth="1"
-            strokeDasharray="5 5"
-            className="animate-pulse"
-          />
-          <path
-            d="M 45% 30% Q 55% 20% 65% 15%"
-            fill="none"
-            stroke="url(#lineGradient)"
-            strokeWidth="1"
-            strokeDasharray="5 5"
-            className="animate-pulse"
-          />
-        </svg>
       </div>
 
       {/* Selected Region Panel */}
