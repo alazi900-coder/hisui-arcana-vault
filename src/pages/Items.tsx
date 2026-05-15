@@ -99,7 +99,7 @@ export default function ItemsPage() {
 
   // Filter and sort items
   const filteredItems = useMemo(() => {
-    let result = items?.filter(item => {
+    const result = items?.filter(item => {
       const searchLower = search.toLowerCase();
       const matchesSearch = !search || 
         item.name_ar.includes(search) ||

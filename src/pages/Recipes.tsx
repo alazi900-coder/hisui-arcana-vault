@@ -130,7 +130,7 @@ export default function RecipesPage() {
       });
     });
     return Array.from(types);
-  }, [recipes, itemsMap]);
+  }, [recipes, items, itemsMap]);
 
   // Type stats
   const typeStats = useMemo(() => {

@@ -2,6 +2,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { PokemonCard } from '@/components/PokemonCard';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
+import type { PokemonType } from '@/types/pokemon';
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Search, CheckCircle2, Star, Sparkles } from 'lucide-react';
@@ -19,8 +20,7 @@ export default function PokemonPage() {
   const livingDexMap = useLivingDexMap();
 
   const pokemon = useLiveQuery(async () => {
-    let query = db.pokemon.orderBy('dex_no');
-    const all = await query.toArray();
+    const all = await db.pokemon.orderBy('dex_no').toArray();
     
     return all.filter(p => {
       const matchesSearch = !search || 
@@ -28,7 +28,7 @@ export default function PokemonPage() {
         p.name_en.toLowerCase().includes(search.toLowerCase()) ||
         String(p.dex_no).includes(search);
       
-      const matchesType = !typeFilter || p.types.includes(typeFilter as any);
+      const matchesType = !typeFilter || p.types.includes(typeFilter as PokemonType);
       
       return matchesSearch && matchesType;
     });

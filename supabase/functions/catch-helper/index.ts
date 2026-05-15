@@ -5,6 +5,13 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+interface SpawnInfo {
+  area: string;
+  conditions: string;
+  rarity: string;
+  isAlpha?: boolean;
+}
+
 const CATCH_HELPER_PROMPT = `You are a Pokémon Legends: Arceus catching expert. Give practical, concise tips for catching specific Pokémon.
 
 Your advice should include:
@@ -30,7 +37,7 @@ serve(async (req) => {
     }
 
     // Build the prompt with spawn data
-    const spawnDetails = spawns.map((s: any) => 
+    const spawnDetails = (spawns as SpawnInfo[]).map((s) => 
       `- ${s.area}: ${s.conditions} (${s.rarity}${s.isAlpha ? ', Alpha' : ''})`
     ).join('\n');
 

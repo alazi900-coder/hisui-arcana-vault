@@ -81,31 +81,36 @@ export default function Index() {
     const details = await Promise.all(recents.map(async (r) => {
       let name_ar = '', name_en = '';
       switch (r.type) {
-        case 'pokemon':
+        case 'pokemon': {
           const poke = await db.pokemon.get(r.id);
           name_ar = poke?.name_ar || '';
           name_en = poke?.name_en || '';
           break;
-        case 'move':
+        }
+        case 'move': {
           const move = await db.moves.get(r.id);
           name_ar = move?.name_ar || '';
           name_en = move?.name_en || '';
           break;
-        case 'item':
+        }
+        case 'item': {
           const item = await db.items.get(r.id);
           name_ar = item?.name_ar || '';
           name_en = item?.name_en || '';
           break;
-        case 'location':
+        }
+        case 'location': {
           const loc = await db.locations.get(r.id);
           name_ar = loc?.name_ar || '';
           name_en = loc?.name_en || '';
           break;
-        case 'request':
+        }
+        case 'request': {
           const req = await db.requests.get(r.id);
           name_ar = req?.title_ar || '';
           name_en = req?.title_en || '';
           break;
+        }
       }
       return { ...r, name_ar, name_en };
     }));

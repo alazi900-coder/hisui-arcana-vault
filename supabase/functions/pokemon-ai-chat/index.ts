@@ -5,6 +5,11 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+interface TeamMember {
+  name: string;
+  types: string[];
+}
+
 const POKEMON_SYSTEM_PROMPT = `You are an expert Pokémon assistant for Pokémon Legends: Arceus (Hisui region). You help players with:
 
 1. **Type Matchups**: Which Pokémon are strong/weak against others
@@ -44,7 +49,7 @@ serve(async (req) => {
         systemPrompt += `\n\nThe user is currently viewing: ${context.currentPokemon.name} (${context.currentPokemon.types.join('/')})`;
       }
       if (context.team && context.team.length > 0) {
-        systemPrompt += `\n\nUser's current team: ${context.team.map((p: any) => p.name).join(', ')}`;
+        systemPrompt += `\n\nUser's current team: ${(context.team as TeamMember[]).map((p) => p.name).join(', ')}`;
       }
     }
 
