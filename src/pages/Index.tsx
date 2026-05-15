@@ -8,7 +8,8 @@ import { Link } from 'react-router-dom';
 import { 
   Grid3X3, Swords, Package, MapPin, ClipboardList, GitCompare, 
   Upload, Sparkles, Crown, Zap, FlaskConical, Clock, Search, Map,
-  Users, Calculator, Heart, Target, WifiOff, Download, CheckCircle, Loader2
+  Users, Calculator, Heart, Target, WifiOff, Download, CheckCircle, Loader2,
+  Gamepad2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -30,6 +31,7 @@ const quickLinks = [
 const toolsLinks = [
   { path: '/team-builder', icon: Users, labelAr: 'بناء الفريق', labelEn: 'Team Builder', color: 'bg-primary/20 text-primary' },
   { path: '/damage-calculator', icon: Calculator, labelAr: 'حاسبة الضرر', labelEn: 'Damage Calc', color: 'bg-destructive/20 text-destructive' },
+  { path: '/battle-simulator', icon: Gamepad2, labelAr: 'محاكي المعركة', labelEn: 'Battle Sim', color: 'bg-type-fighting/20 text-type-fighting' },
   { path: '/type-chart', icon: Grid3X3, labelAr: 'مخطط الأنواع', labelEn: 'Type Chart', color: 'bg-accent/20 text-accent' },
   { path: '/favorites', icon: Heart, labelAr: 'المفضلة', labelEn: 'Favorites', color: 'bg-type-fire/20 text-type-fire' },
   { path: '/tracker', icon: Target, labelAr: 'المتتبع', labelEn: 'Tracker', color: 'bg-gold/20 text-gold' },

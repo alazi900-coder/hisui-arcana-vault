@@ -38,6 +38,7 @@ const DataImportPage = lazy(() => import("./pages/DataImport"));
 const MapPage = lazy(() => import("./pages/Map"));
 const TeamBuilderPage = lazy(() => import("./pages/TeamBuilder"));
 const DamageCalculatorPage = lazy(() => import("./pages/DamageCalculator"));
+const BattleSimulatorPage = lazy(() => import("./pages/BattleSimulator"));
 const TypeChartPage = lazy(() => import("./pages/TypeChart"));
 const FavoritesPage = lazy(() => import("./pages/Favorites"));
 const TrackerPage = lazy(() => import("./pages/Tracker"));
@@ -110,6 +111,7 @@ function AppContent() {
               {/* New Features */}
               <Route path="/team-builder" element={<TeamBuilderPage />} />
               <Route path="/damage-calculator" element={<DamageCalculatorPage />} />
+              <Route path="/battle-simulator" element={<BattleSimulatorPage />} />
               <Route path="/type-chart" element={<TypeChartPage />} />
               <Route path="/favorites" element={<FavoritesPage />} />
               <Route path="/tracker" element={<TrackerPage />} />

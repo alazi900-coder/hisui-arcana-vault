@@ -139,6 +139,8 @@ export interface Move {
   power?: number;
   accuracy?: number;
   pp?: number;
+  /** Move priority (default 0). Quick Attack etc. use +1. */
+  priority?: number;
   description_ar: string;
   description_en: string;
 }
